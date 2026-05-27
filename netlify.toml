@@ -1,0 +1,132 @@
+# Netlify configuration for MeasuredQuote (Phase 4 scaffolding).
+#
+# This config assumes the production deployment topology recommended in
+# `measuredquote-netlify-supabase-stripe-plan.md`:
+#
+#   - SPA frontend  -> Netlify (static CDN), built from `client/`
+#   - API backend   -> Netlify Functions (`/api/*` is rewritten to functions)
+#   - Database      -> Supabase Postgres (with RLS) via service-role key
+#                      stored as a Netlify environment variable
+#   - Billing       -> Stripe (Checkout, Customer Portal, Webhooks) via
+#                      Netlify Functions
+#
+# Local development is unchanged: `npm run dev` still runs the Express
+# server in `server/index.ts`. The Netlify build only produces the static
+# bundle and packages the functions; it does NOT replace the Express
+# server you use today.
+
+[build]
+  # Produce the static SPA into `dist/public` (same path the Perplexity
+  # deploy pipeline already uses) and have Netlify pick up Lambdas from
+  # `netlify/functions`.
+  command   = "npm run build"
+  publish   = "dist/public"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+  # Functions use the modern esbuild-based bundler.
+  NETLIFY_USE_YARN = "false"
+
+# --- API routing ----------------------------------------------------------
+# All `/api/*` traffic is forwarded to Netlify Functions of the same name.
+# Functions live in `netlify/functions/<name>.ts`. The `:splat` token in
+# the destination lets a single function handle nested paths like
+# `/api/leads/123/proposal.pdf` if we want to colocate those in one file.
+
+[[redirects]]
+  from   = "/api/leads/*"
+  to    = "/.netlify/functions/leads/:splat"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/api/events"
+  to    = "/.netlify/functions/events"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/api/events/*"
+  to    = "/.netlify/functions/events/:splat"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/api/integrations"
+  to    = "/.netlify/functions/integrations"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/api/integrations/*"
+  to    = "/.netlify/functions/integrations/:splat"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/api/webhooks/deliveries"
+  to    = "/.netlify/functions/webhook-deliveries"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/api/stripe/checkout"
+  to    = "/.netlify/functions/stripe-checkout"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/api/stripe/portal"
+  to    = "/.netlify/functions/stripe-portal"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/api/stripe/webhook"
+  to    = "/.netlify/functions/stripe-webhook"
+  status = 200
+  force  = true
+
+# --- SPA fallback ---------------------------------------------------------
+# Any non-API path should return the SPA shell so wouter's hash router can
+# take over. (We use hash routing today so technically `/` is enough, but
+# keep a catch-all so direct deep links to `/dashboard` still work even if
+# we later move to path routing.)
+
+[[redirects]]
+  from   = "/*"
+  to    = "/index.html"
+  status = 200
+
+# --- Function bundling ----------------------------------------------------
+# Functions are TypeScript and use shared helpers under `netlify/lib/`.
+# We tell esbuild to include those files plus the `@shared/schema` types so
+# Lambdas stay self-contained.
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = [
+    "netlify/lib/**",
+    "shared/**",
+  ]
+
+# Stripe webhooks must read the raw request body to verify the signature.
+# Netlify exposes the raw body via `event.body` + `isBase64Encoded`, so we
+# do NOT want any body parser middleware in front of the webhook function.
+[functions."stripe-webhook"]
+  # Pin a slightly longer timeout in case Stripe's verification + DB write
+  # spikes; Netlify's default is 10s on the free tier.
+  timeout = 26
+
+# --- Security headers -----------------------------------------------------
+# Light baseline; the production-requirements doc has the full CSP/COOP
+# recommendations.
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options        = "SAMEORIGIN"
+    Referrer-Policy        = "strict-origin-when-cross-origin"
+    Permissions-Policy     = "geolocation=(self), microphone=(), camera=()"

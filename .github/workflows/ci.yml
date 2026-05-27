@@ -1,0 +1,38 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    name: build + typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript check
+        run: npx tsc --noEmit
+
+      - name: Build (client + server bundle)
+        run: npm run build
+        env:
+          # CI never has real secrets. The build must succeed in demo mode.
+          NODE_ENV: production
+
+      - name: Smoke-check artifacts
+        run: |
+          test -f dist/public/index.html
+          test -f dist/index.cjs
+          ls -lh dist/public dist

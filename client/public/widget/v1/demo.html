@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MeasuredQuote Widget — embed demo</title>
+    <style>
+      :root { color-scheme: light; }
+      body {
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        margin: 0;
+        background: #fafaf9;
+        color: #0a0a0a;
+      }
+      header {
+        padding: 36px 40px 12px;
+        max-width: 960px;
+        margin: 0 auto;
+      }
+      h1 { font-size: 18px; margin: 0 0 6px; }
+      p { color: #71717a; font-size: 14px; max-width: 640px; line-height: 1.55; }
+      .frame {
+        max-width: 960px;
+        margin: 0 auto 60px;
+        padding: 0 40px;
+      }
+      pre {
+        background: #0a0a0a;
+        color: #f4f4f5;
+        padding: 14px 18px;
+        font-size: 12px;
+        border-radius: 8px;
+        overflow: auto;
+      }
+      #mq-estimator {
+        border: 1px solid #e4e4e7;
+        border-radius: 12px;
+        background: #fff;
+        overflow: hidden;
+        min-height: 680px;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>MeasuredQuote — widget embed demo</h1>
+      <p>
+        This is a static reference page showing how a contractor would embed the
+        estimator on their site. The snippet below is the only thing they need
+        to paste; the loader handles iframe sizing and lead callbacks.
+      </p>
+      <pre>&lt;script
+  src="https://embed.measuredquote.com/widget/v1/widget.js"
+  data-mq-tenant="ten_demo_ortiz_concrete"
+  data-mq-trade="concrete"
+  data-mq-language="en"
+  data-mq-mount="#mq-estimator"
+  async&gt;&lt;/script&gt;</pre>
+    </header>
+    <main class="frame">
+      <div id="mq-estimator"></div>
+    </main>
+
+    <!-- Local loader (same origin) — production points at embed.measuredquote.com. -->
+    <script
+      src="./widget.js"
+      data-mq-tenant="ten_demo_ortiz_concrete"
+      data-mq-trade="concrete"
+      data-mq-language="en"
+      data-mq-mount="#mq-estimator"
+      async
+    ></script>
+  </body>
+</html>
