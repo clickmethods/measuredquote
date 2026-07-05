@@ -1,7 +1,7 @@
 // Auth helper for Netlify Functions.
 //
 // MeasuredQuote uses Supabase Auth. The browser stores the session JWT in
-// localStorage via @supabase/supabase-js, and forwards it to our functions
+// the browser auth flow and forwards it to our functions
 // as `Authorization: Bearer <jwt>`.
 //
 // In addition to user sessions, the public estimator widget signs each

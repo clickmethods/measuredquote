@@ -1,60 +1,113 @@
-// Browser-side Supabase client (PRODUCTION mode only).
+// Browser-side Supabase REST adapter.
 //
-// In the current prototype the dashboard talks to the Express API; Supabase
-// is OFF by default. When you add the right env vars at build time, this
-// client comes online and the production code paths under
-// `client/src/lib/productionMode.ts` start using it.
-//
-// Required Vite env vars (must be prefixed with `VITE_` to be exposed to
-// the browser bundle):
-//
-//   VITE_SUPABASE_URL              -> https://<project>.supabase.co
-//   VITE_SUPABASE_ANON_KEY         -> the public "anon" key (a.k.a.
-//                                     "publishable" key in newer dashboards).
-//
-// The service-role key MUST NEVER appear in client code or env vars
-// prefixed with VITE_. It only lives in Netlify Functions.
+// The preview iframe disallows browser persistence APIs. To keep MeasuredQuote
+// deployable in that environment, the client bundle intentionally avoids
+// importing `@supabase/supabase-js`. Production server work still uses Supabase
+// from Netlify Functions; this file only provides the small auth surface used by
+// the login, onboarding, and settings screens.
 
-import type { SupabaseClient } from "@supabase/supabase-js";
+type AuthSession = {
+  access_token: string;
+  refresh_token?: string;
+  user?: { email?: string };
+};
 
-let cached: SupabaseClient | null = null;
-let loadAttempted = false;
+type AuthResult<T = unknown> = { data: T; error: null } | { data: null; error: Error };
+
+export type LightweightSupabaseClient = {
+  auth: {
+    getSession(): Promise<{ data: { session: AuthSession | null }; error: null }>;
+    signInWithOtp(args: {
+      email: string;
+      options?: { emailRedirectTo?: string };
+    }): Promise<AuthResult>;
+    signInWithPassword(args: { email: string; password: string }): Promise<AuthResult>;
+    signUp(args: {
+      email: string;
+      password: string;
+      options?: { emailRedirectTo?: string };
+    }): Promise<AuthResult>;
+  };
+};
+
+let cached: LightweightSupabaseClient | null = null;
+
+const supabaseUrl = () => import.meta.env.VITE_SUPABASE_URL as string | undefined;
+const anonKey = () => import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
 export function isSupabaseConfigured(): boolean {
-  return Boolean(
-    import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY,
-  );
+  return Boolean(supabaseUrl() && anonKey());
 }
 
-/**
- * Returns a memoized Supabase browser client, or `null` if the required
- * env vars are missing. The client is loaded lazily via dynamic import so
- * builds without Supabase env vars don't pull the SDK into the initial JS
- * bundle.
- */
-export async function getSupabase(): Promise<SupabaseClient | null> {
+export async function getSupabase(): Promise<LightweightSupabaseClient | null> {
   if (cached) return cached;
-  if (loadAttempted) return null;
-  loadAttempted = true;
-
   if (!isSupabaseConfigured()) return null;
-  try {
-    const { createClient } = await import("@supabase/supabase-js");
-    cached = createClient(
-      import.meta.env.VITE_SUPABASE_URL as string,
-      import.meta.env.VITE_SUPABASE_ANON_KEY as string,
-      {
-        auth: {
-          persistSession: false, // Sandboxed iframe blocks localStorage.
-          autoRefreshToken: false,
-          detectSessionInUrl: false,
+
+  const url = supabaseUrl()!;
+  const key = anonKey()!;
+
+  async function authFetch<T>(path: string, body: unknown): Promise<AuthResult<T>> {
+    try {
+      const res = await fetch(`${url}/auth/v1${path}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: key,
+          Authorization: `Bearer ${key}`,
         },
-      },
-    );
-    return cached;
-  } catch {
-    return null;
+        body: JSON.stringify(body),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(json?.msg || json?.message || json?.error_description || `HTTP ${res.status}`);
+      }
+      return { data: json as T, error: null };
+    } catch (err) {
+      return { data: null, error: err instanceof Error ? err : new Error(String(err)) };
+    }
   }
+
+  cached = {
+    auth: {
+      async getSession() {
+        return { data: { session: readSessionFromUrl() }, error: null };
+      },
+      signInWithOtp({ email, options }) {
+        return authFetch("/otp", {
+          email,
+          create_user: true,
+          options: { email_redirect_to: options?.emailRedirectTo },
+        });
+      },
+      signInWithPassword({ email, password }) {
+        return authFetch("/token?grant_type=password", { email, password });
+      },
+      signUp({ email, password, options }) {
+        return authFetch("/signup", {
+          email,
+          password,
+          options: { email_redirect_to: options?.emailRedirectTo },
+        });
+      },
+    },
+  };
+
+  return cached;
+}
+
+function readSessionFromUrl(): AuthSession | null {
+  if (typeof window === "undefined") return null;
+  const fragment = window.location.hash.includes("access_token=")
+    ? window.location.hash.split("?")[0]
+    : "";
+  const params = new URLSearchParams(fragment.replace(/^#\/?/, "").replace(/^#/, ""));
+  const accessToken = params.get("access_token");
+  if (!accessToken) return null;
+  return {
+    access_token: accessToken,
+    refresh_token: params.get("refresh_token") ?? undefined,
+    user: { email: params.get("email") ?? undefined },
+  };
 }
 
 export type ProductionStatus = {
@@ -68,7 +121,6 @@ export type ProductionStatus = {
   embedHost?: string;
 };
 
-/** Snapshot used by the Production Settings UI for the health checklist. */
 export function getProductionStatus(): ProductionStatus {
   const appUrl = import.meta.env.VITE_APP_URL as string | undefined;
   let appDomain: string | undefined;
@@ -79,7 +131,7 @@ export function getProductionStatus(): ProductionStatus {
   }
   return {
     supabaseConfigured: isSupabaseConfigured(),
-    supabaseUrl: import.meta.env.VITE_SUPABASE_URL as string | undefined,
+    supabaseUrl: supabaseUrl(),
     appUrl,
     appDomain,
     stripePublishableConfigured: Boolean(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY),

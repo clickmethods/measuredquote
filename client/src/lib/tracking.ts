@@ -3,7 +3,7 @@ import { apiRequest } from "./queryClient";
 /**
  * Lightweight client-side event tracker.
  *
- * Persists nothing in the browser (sandbox blocks localStorage); the session id
+ * Persists nothing in the browser; the session id
  * lives in module state so it survives in-app navigation but resets on full reload.
  * Calls fire-and-forget — never throws, never blocks UI.
  */
