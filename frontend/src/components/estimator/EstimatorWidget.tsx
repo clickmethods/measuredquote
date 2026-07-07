@@ -75,7 +75,7 @@ export default function EstimatorWidget({ trade, tenant = null, widgetToken = nu
   }
 
   // Fired when the homeowner unlocks the itemized estimate with name + phone.
-  // This is the lead-capture moment: submit to the MeasuredQuote backend with
+  // This is the lead-capture moment: submit to the Measured Quote backend with
   // the same numbers the results screen renders.
   function handleLeadCapture(contact: ContactData) {
     if (!address || !selections) return;

@@ -50,7 +50,7 @@ export default function EstimatorStepMap({ trade, lang, leadData, onContinue }: 
         return result.results[0].geometry.location.toJSON();
       }
     } catch (err) {
-      console.warn('[Draw-to-Quote] Geocoding failed:', err);
+      console.warn('[Measured Quote] Geocoding failed:', err);
     }
     return null;
   }, []);
@@ -158,7 +158,7 @@ export default function EstimatorStepMap({ trade, lang, leadData, onContinue }: 
       setLoadError('');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error loading map';
-      console.error('[Draw-to-Quote] Map init error:', message);
+      console.error('[Measured Quote] Map init error:', message);
       setLoadError(message);
       setMapStatus('error');
     }

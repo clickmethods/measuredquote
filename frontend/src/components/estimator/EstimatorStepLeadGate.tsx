@@ -64,7 +64,7 @@ export default function EstimatorStepLeadGate({ lang, onSubmit }: Props) {
 
         // Check that the Places library was loaded
         if (!maps.places) {
-          console.warn('[Draw-to-Quote] Places library not available — autocomplete disabled');
+          console.warn('[Measured Quote] Places library not available — autocomplete disabled');
           setShowManual(true);
           return;
         }
@@ -137,7 +137,7 @@ export default function EstimatorStepLeadGate({ lang, onSubmit }: Props) {
 
         setPlacesReady(true);
       } catch (err) {
-        console.warn('[Draw-to-Quote] Google Places init failed:', err);
+        console.warn('[Measured Quote] Google Places init failed:', err);
         setShowManual(true);
       }
     }

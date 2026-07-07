@@ -175,7 +175,7 @@ export default function EmbedTab() {
           {/* Show branding toggle */}
           <div className="flex items-center justify-between py-2">
             <div>
-              <p className="text-sm font-medium text-[#334155]">Show Draw-to-Quote Branding</p>
+              <p className="text-sm font-medium text-[#334155]">Show Measured Quote Branding</p>
               <p className="text-xs text-[#94A3B8]">Small "Powered by" badge on widget</p>
             </div>
             <button
@@ -266,7 +266,7 @@ export default function EmbedTab() {
                 {/* Branding badge */}
                 {showBranding && (
                   <div className="text-center mt-4">
-                    <span className="text-[9px] text-[#94A3B8]">Powered by Draw-to-Quote</span>
+                    <span className="text-[9px] text-[#94A3B8]">Powered by Measured Quote</span>
                   </div>
                 )}
               </div>

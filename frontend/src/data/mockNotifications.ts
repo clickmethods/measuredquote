@@ -114,7 +114,7 @@ export const mockEmailTemplates: EmailTemplate[] = [
 New Lead Alert
 </td></tr>
 <tr><td style="padding:24px;">
-<p style="margin:0 0 16px;color:#334155;font-size:14px;">You have a new lead from your Draw-to-Quote estimator.</p>
+<p style="margin:0 0 16px;color:#334155;font-size:14px;">You have a new lead from your Measured Quote estimator.</p>
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFC;border-radius:8px;padding:16px;margin-bottom:16px;">
 <tr><td style="padding:4px 0;color:#94A3B8;font-size:12px;width:120px;">Name</td><td style="padding:4px 0;color:#0F172A;font-size:13px;font-weight:bold;">John Smith</td></tr>
 <tr><td style="padding:4px 0;color:#94A3B8;font-size:12px;">Email</td><td style="padding:4px 0;color:#0F172A;font-size:13px;">john@example.com</td></tr>
@@ -132,7 +132,7 @@ New Lead Alert
 <a href="#" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:bold;">View in Dashboard</a>
 </td></tr>
 <tr><td style="padding:16px 24px;border-top:1px solid #E2E8F0;color:#94A3B8;font-size:11px;text-align:center;">
-Sent by Draw-to-Quote &middot; <a href="#" style="color:#2563EB;">Unsubscribe</a>
+Sent by Measured Quote &middot; <a href="#" style="color:#2563EB;">Unsubscribe</a>
 </td></tr>
 </table>
 </td></tr></table>
@@ -171,7 +171,7 @@ Premier Construction Co.
 <p style="margin:0;color:#94A3B8;font-size:12px;text-align:center;">Questions? Reply to this email or call us at (512) 555-0100.</p>
 </td></tr>
 <tr><td style="padding:16px 24px;border-top:1px solid #E2E8F0;color:#94A3B8;font-size:11px;text-align:center;">
-Powered by <a href="#" style="color:#2563EB;text-decoration:none;">Draw-to-Quote</a>
+Powered by <a href="#" style="color:#2563EB;text-decoration:none;">Measured Quote</a>
 </td></tr>
 </table>
 </td></tr></table>

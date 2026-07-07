@@ -342,7 +342,7 @@ function ConnectModal({ crmId, onClose }: { crmId: string; onClose: () => void }
           </li>
           <li>
             Choose <strong className="text-[#334155]">Catch Hook</strong> and
-            paste your webhook URL into Draw-to-Quote.
+            paste your webhook URL into Measured Quote.
           </li>
           <li>
             Add an action step to push leads to your CRM (HubSpot, Salesforce,
@@ -373,7 +373,7 @@ function ConnectModal({ crmId, onClose }: { crmId: string; onClose: () => void }
           <li>
             Set the HTTP method to{' '}
             <strong className="text-[#334155]">POST</strong> and paste the
-            URL into Draw-to-Quote.
+            URL into Measured Quote.
           </li>
           <li>
             Add downstream nodes to process leads (HTTP Request, Set, Code,

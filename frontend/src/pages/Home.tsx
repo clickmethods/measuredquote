@@ -79,7 +79,7 @@ function HeroSection() {
           transition={{ duration: 0.5, delay: 0.8, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
           className="mx-auto mt-6 max-w-[640px] text-lg leading-relaxed text-white/75"
         >
-          Draw-to-Quote embeds on any contractor website. Homeowners get instant ballpark prices.
+          Measured Quote embeds on any contractor website. Homeowners get instant ballpark prices.
           You get qualified leads with full project scope, budget, and contact details.
         </motion.p>
 
@@ -452,7 +452,7 @@ function ROICalculatorSection() {
           transition={{ duration: 0.6, delay: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
           className="mt-8 rounded-2xl bg-white/5 p-8 text-center border border-white/10"
         >
-          <p className="text-sm text-[#93C5FD]">With Draw-to-Quote at 12% capture rate:</p>
+          <p className="text-sm text-[#93C5FD]">With Measured Quote at 12% capture rate:</p>
           <p className="mt-3 font-mono text-3xl font-semibold text-[#4ADE80]">
             {ezLeads} leads/month
           </p>
@@ -807,7 +807,7 @@ function FinalCTASection() {
           custom={0.2}
           className="mx-auto mt-5 max-w-[560px] text-lg leading-relaxed text-white/70"
         >
-          Join 500+ contractors already using Draw-to-Quote to capture and convert more leads.
+          Join 500+ contractors already using Measured Quote to capture and convert more leads.
         </motion.p>
 
         <motion.div

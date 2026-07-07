@@ -29,9 +29,12 @@ export default function Navbar() {
     >
       <div className="mx-auto flex h-full max-w-[1280px] items-center justify-between px-6 lg:px-12">
         {/* Logo */}
-        <Link to="/" className="flex items-center text-xl md:text-2xl font-bold tracking-tight">
-          <span className="text-[#2563EB]">Draw</span>
-          <span className="text-[#0F172A] font-semibold">-to-Quote</span>
+        <Link to="/" className="flex items-center gap-2.5 text-xl md:text-2xl font-bold tracking-tight">
+          <img src="/logo.svg" alt="Measured Quote" className="h-8 w-8 md:h-9 md:w-9" />
+          <span>
+            <span className="text-[#1D4ED8] font-medium">Measured </span>
+            <span className="text-[#1D4ED8] font-bold">Quote</span>
+          </span>
         </Link>
 
         {/* Desktop nav */}

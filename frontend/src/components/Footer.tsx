@@ -92,7 +92,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-[#142C4D] flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-[#93C5FD]/70 text-xs">
-            &copy; 2025 Draw-to-Quote. All rights reserved.
+            &copy; 2025 Measured Quote. All rights reserved.
           </p>
           <p className="text-[#93C5FD]/50 text-xs">
             Built for contractors.

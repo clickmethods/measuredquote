@@ -26,8 +26,9 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       {/* Logo */}
       <div className="py-5 px-6 flex-shrink-0">
         <div className="flex items-center text-xl font-bold tracking-tight">
-          <span className="text-[#2563EB]">Draw</span>
-          <span className="text-white font-semibold">-to-Quote</span>
+          <img src="/logo.svg" alt="" className="h-6 w-6 mr-2 inline-block brightness-0 invert" />
+          <span className="text-white font-medium">Measured </span>
+          <span className="text-white font-bold">Quote</span>
         </div>
       </div>
 

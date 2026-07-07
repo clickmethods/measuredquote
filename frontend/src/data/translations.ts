@@ -123,7 +123,7 @@ export const translations: Record<'en', TranslationSet> = {
     'results.quoteMessage': 'A contractor will contact you within 24 hours.',
     'results.startOver': 'Start Over',
     'results.tryAnother': 'Try Another Trade',
-    'results.poweredBy': 'Powered by Draw-to-Quote',
+    'results.poweredBy': 'Powered by Measured Quote',
     'results.base': 'Base ({material})',
     'results.total': 'Total',
 

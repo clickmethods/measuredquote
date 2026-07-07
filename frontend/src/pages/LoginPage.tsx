@@ -67,7 +67,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md bg-white rounded-[24px] border border-[#E2E8F0] shadow-xl p-8">
         <div className="mb-6">
-          <div className="text-lg font-bold text-[#0F172A]">Sign in to MeasuredQuote</div>
+          <div className="text-lg font-bold text-[#0F172A]">Sign in to Measured Quote</div>
           <div className="text-sm text-[#64748B] mt-1">Manage leads, integrations, and your widget.</div>
         </div>
 
