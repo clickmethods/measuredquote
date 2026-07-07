@@ -6,6 +6,12 @@ import type { LeadFormData } from './EstimatorStepLeadGate';
 import type { MaterialSelections } from './EstimatorStepMaterials';
 import PDFDownloadButton from './PDFDownloadButton';
 
+export interface ContactData {
+  fullName: string;
+  phone: string;
+  email: string;
+}
+
 interface Props {
   trade: TradeConfig;
   lang: Language;
@@ -13,6 +19,8 @@ interface Props {
   measurement: number;
   selections: MaterialSelections;
   onStartOver: () => void;
+  /** Called once when the homeowner unlocks the itemized estimate with name + phone. */
+  onLeadCapture: (contact: ContactData) => void;
 }
 
 interface LineItem {
@@ -21,11 +29,32 @@ interface LineItem {
   amountHigh: number;
 }
 
-export default function EstimatorStepResults({ trade, lang, leadData, measurement, selections, onStartOver }: Props) {
+export default function EstimatorStepResults({ trade, lang, leadData, measurement, selections, onStartOver, onLeadCapture }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const [animatedLow, setAnimatedLow] = useState(0);
   const [animatedHigh, setAnimatedHigh] = useState(0);
   const [showToast, setShowToast] = useState(false);
+
+  // ── Phone gate: rough range is free, itemized estimate requires name + phone ──
+  const [unlocked, setUnlocked] = useState(false);
+  const [contact, setContact] = useState<ContactData>({ fullName: '', phone: '', email: '' });
+  const [gateError, setGateError] = useState<string | null>(null);
+
+  function handleUnlock(e: React.FormEvent) {
+    e.preventDefault();
+    const digits = contact.phone.replace(/\D/g, '');
+    if (!contact.fullName || contact.fullName.trim().length < 2) {
+      setGateError('Please enter your name.');
+      return;
+    }
+    if (digits.length < 10) {
+      setGateError('Please enter a valid 10-digit phone number.');
+      return;
+    }
+    setGateError(null);
+    onLeadCapture({ ...contact, phone: digits });
+    setUnlocked(true);
+  }
 
   // Get selected material info
   let selectedMaterialName = '';
@@ -188,12 +217,20 @@ export default function EstimatorStepResults({ trade, lang, leadData, measuremen
         <h2 className="text-3xl font-bold text-[#0F172A] text-center mb-1">
           {t(lang, 'results.title')}
         </h2>
-        <p className="text-[#475569] text-sm text-center mb-1">
-          {t(lang, 'results.thankYou').replace('{name}', leadData.fullName.split(' ')[0])}
-        </p>
-        <p className="text-[#94A3B8] text-xs text-center mb-6">
-          {t(lang, 'results.emailSent').replace('{email}', leadData.email)}
-        </p>
+        {unlocked ? (
+          <>
+            <p className="text-[#475569] text-sm text-center mb-1">
+              Thanks, {contact.fullName.split(' ')[0]}! Here's your full itemized estimate.
+            </p>
+            <p className="text-[#94A3B8] text-xs text-center mb-6">
+              A contractor will call you shortly to schedule a firm quote.
+            </p>
+          </>
+        ) : (
+          <p className="text-[#475569] text-sm text-center mb-6">
+            Here's your rough price range for this project.
+          </p>
+        )}
 
         <div className="bg-white rounded-[24px] shadow-xl border border-[#E2E8F0] p-6 md:p-8">
           {/* Project summary */}
@@ -218,7 +255,8 @@ export default function EstimatorStepResults({ trade, lang, leadData, measuremen
             </span>
           </div>
 
-          {/* Line items */}
+          {/* Line items — unlocked only */}
+          {unlocked && (<>
           <h5 className="text-sm font-semibold text-[#334155] mb-3 uppercase tracking-wide">
             {t(lang, 'results.lineItems')}
           </h5>
@@ -240,6 +278,7 @@ export default function EstimatorStepResults({ trade, lang, leadData, measuremen
               </div>
             ))}
           </div>
+          </>)}
 
           <style>{`
             @keyframes fadeSlideUp {
@@ -269,8 +308,54 @@ export default function EstimatorStepResults({ trade, lang, leadData, measuremen
             <p className="text-xs text-[#94A3B8]">{t(lang, 'results.ballparkOnly')}</p>
           </div>
 
+          {/* Phone gate — shown until the homeowner unlocks the itemized estimate */}
+          {!unlocked && (
+            <form onSubmit={handleUnlock} className="mb-6 rounded-[16px] border border-[#BFDBFE] bg-[#EFF6FF] p-5">
+              <h5 className="text-sm font-bold text-[#0F172A] mb-1">
+                Unlock your full itemized estimate
+              </h5>
+              <p className="text-xs text-[#475569] mb-4">
+                See the line-by-line breakdown and get a printable PDF. A local contractor will follow up with a firm quote.
+              </p>
+              <div className="flex flex-col gap-3">
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  value={contact.fullName}
+                  onChange={(e) => setContact({ ...contact, fullName: e.target.value })}
+                  className="w-full rounded-xl border border-[#E2E8F0] px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                />
+                <input
+                  type="tel"
+                  placeholder="Phone number"
+                  value={contact.phone}
+                  onChange={(e) => setContact({ ...contact, phone: e.target.value })}
+                  className="w-full rounded-xl border border-[#E2E8F0] px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                />
+                <input
+                  type="email"
+                  placeholder="Email (optional)"
+                  value={contact.email}
+                  onChange={(e) => setContact({ ...contact, email: e.target.value })}
+                  className="w-full rounded-xl border border-[#E2E8F0] px-3.5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
+                />
+                {gateError && <p className="text-xs text-red-600">{gateError}</p>}
+                <button
+                  type="submit"
+                  className="w-full bg-[#2563EB] text-white font-semibold text-base py-3.5 px-6 rounded-full transition-all duration-200 hover:bg-[#1D4ED8] hover:-translate-y-0.5 hover:shadow-lg"
+                >
+                  Show My Itemized Estimate
+                </button>
+                <p className="text-center text-[11px] text-[#94A3B8]">
+                  No spam. Your info only goes to the contractor for this estimate.
+                </p>
+              </div>
+            </form>
+          )}
+
           {/* CTA buttons */}
           <div className="flex flex-col gap-3">
+            {unlocked && (<>
             <button
               onClick={handleRequestQuote}
               className="w-full bg-[#16A34A] text-white font-semibold text-base py-3.5 px-6 rounded-full transition-all duration-200 hover:bg-[#15803D] hover:-translate-y-0.5 hover:shadow-lg"
@@ -283,9 +368,9 @@ export default function EstimatorStepResults({ trade, lang, leadData, measuremen
               contractorName=""
               contractorPhone=""
               contractorEmail=""
-              clientName={leadData.fullName}
-              clientEmail={leadData.email}
-              clientPhone={leadData.phone}
+              clientName={contact.fullName}
+              clientEmail={contact.email}
+              clientPhone={contact.phone}
               projectAddress={`${leadData.streetAddress}, ${leadData.city}, ${leadData.state} ${leadData.zipCode}`}
               tradeName={trade.name}
               tradeNameEs={trade.nameEs}
@@ -302,6 +387,7 @@ export default function EstimatorStepResults({ trade, lang, leadData, measuremen
               date={formattedDate}
               lang={lang}
             />
+            </>)}
 
             <button
               onClick={onStartOver}

@@ -4,7 +4,7 @@ export interface TranslationSet {
   [key: string]: string;
 }
 
-export const translations: Record<Language, TranslationSet> = {
+export const translations: Record<'en', TranslationSet> = {
   en: {
     // ── Start Screen ──
     'start.getStarted': 'Get Started',
@@ -132,132 +132,6 @@ export const translations: Record<Language, TranslationSet> = {
     'widget.back': 'Back',
   },
 
-  es: {
-    // ── Start Screen ──
-    'start.getStarted': 'Empezar',
-    'start.headline': 'Estimador de {trade}',
-    'start.description': 'Obtenga una estimacion instantanea en 60 segundos. Sin obligacion, sin presion.',
-    'start.cta': 'Iniciar Mi Estimacion',
-    'start.trust': 'Confiado por mas de 2,000 contratistas a nivel nacional',
-    'start.noObligation': 'Gratis. Sin obligacion. Sin spam.',
-
-    // ── Language Selection ──
-    'lang.title': 'Seleccione su Idioma',
-    'lang.subtitle': 'Elija su idioma preferido para continuar',
-    'lang.english': 'English',
-    'lang.englishContinue': 'Continue in English',
-    'lang.spanish': 'Espanol',
-    'lang.spanishContinue': 'Continuar en Espanol',
-
-    // ── Lead Gate ──
-    'lead.title': 'Empecemos',
-    'lead.subtitle': 'Ingrese sus datos para recibir su estimacion',
-    'lead.fullName': 'Nombre Completo',
-    'lead.fullNamePlaceholder': 'Juan Perez',
-    'lead.email': 'Correo Electronico',
-    'lead.emailPlaceholder': 'juan@ejemplo.com',
-    'lead.phone': 'Numero de Telefono',
-    'lead.phonePlaceholder': '(555) 123-4567',
-    'lead.streetAddress': 'Direccion',
-    'lead.streetPlaceholder': '123 Calle Principal',
-    'lead.city': 'Ciudad',
-    'lead.cityPlaceholder': 'Su ciudad',
-    'lead.state': 'Estado',
-    'lead.statePlaceholder': 'Seleccione estado',
-    'lead.zipCode': 'Codigo Postal',
-    'lead.zipPlaceholder': '12345',
-    'lead.continue': 'Obtener Mi Estimacion',
-    'lead.privacy': 'Su informacion es segura y solo se compartira con contratistas licenciados.',
-    'lead.required': 'Este campo es obligatorio',
-    'lead.nameMin': 'El nombre debe tener al menos 2 caracteres',
-    'lead.emailInvalid': 'Por favor ingrese un correo valido',
-    'lead.phoneInvalid': 'Por favor ingrese un numero de telefono valido de 10 digitos',
-    'lead.addressMin': 'La direccion debe tener al menos 5 caracteres',
-    'lead.cityMin': 'La ciudad debe tener al menos 2 caracteres',
-    'lead.zipInvalid': 'El codigo postal debe tener 5 digitos',
-    'lead.addressSearchLabel': 'Direccion del Proyecto',
-    'lead.addressSearchPlaceholder': '123 Calle Principal, Ciudad, Estado...',
-    'lead.addressSearchRequired': 'Por favor busque y seleccione su direccion',
-    'lead.editAddress': 'Editar direccion',
-    'lead.enterManually': 'Ingresar direccion manualmente',
-
-    // ── Map Drawing ──
-    'map.title.area': 'Dibuje el Area de su Proyecto',
-    'map.title.linear': 'Dibuje la Linea de su Cerca',
-    'map.subtitle.area': 'Busque su direccion, luego use las herramientas para delinear el area de su proyecto.',
-    'map.subtitle.linear': 'Busque su direccion, luego haga clic a lo largo del camino donde desea su cerca.',
-    'map.instructions.area': 'Haga clic para colocar puntos de esquina de su area de proyecto. La medicion se calcula automaticamente.',
-    'map.instructions.linear': 'Haga clic a lo largo de la linea de su propiedad para trazar el camino de la cerca. El total de pies lineales se actualiza automaticamente.',
-    'map.mockLabel': 'En produccion, apareceria la vista satelital de Google Maps con herramientas de dibujo.',
-    'map.loading': 'Cargando mapa satelital...',
-    'map.loadingSub': 'Esto puede tomar un momento',
-    'map.error': 'No se pudo cargar el mapa',
-    'map.errorSub': 'Ingrese su medicion manualmente a continuacion',
-    'map.measurementLabel.area': 'Area',
-    'map.measurementLabel.linear': 'Longitud',
-    'map.measurementUnit.area': 'pies cuadrados',
-    'map.measurementUnit.linear': 'pies lineales',
-    'map.enterManually': 'O ingrese la medicion manualmente:',
-    'map.continue': 'Continuar',
-    'map.searchPlaceholder': 'Busque su direccion...',
-    'map.search': 'Buscar',
-    'map.clear': 'Borrar',
-    'map.clearDrawing': 'Borrar Dibujo',
-    'map.drawnArea': 'Area dibujada',
-    'map.drawnLine': 'Linea dibujada',
-    'map.hint.area': 'Haga clic en la herramienta de dibujo, luego en el mapa para dibujar su area',
-    'map.hint.linear': 'Haga clic en la herramienta de dibujo, luego en el mapa para trazar su linea de cerca',
-    'lead.addressHint': 'Empiece a escribir su direccion para sugerencias automaticas',
-
-    // ── Materials ──
-    'materials.title': 'Seleccione sus Opciones',
-    'materials.subtitle': 'Elija sus materiales y servicios adicionales.',
-    'materials.areaLabel': 'Area del proyecto: {area} pies cuadrados',
-    'materials.lengthLabel': 'Longitud de la cerca: {length} pies lineales',
-    'materials.roofFootprint': 'Huella del techo: {area} pies cuadrados',
-    'materials.pitchNote': '*Las estimaciones incluyen ajuste por inclinacion estandar (1.15x)',
-    'materials.materialLabel': 'Material',
-    'materials.projectTypeLabel': 'Tipo de Proyecto',
-    'materials.subOptionLabel': 'Opciones',
-    'materials.heightLabel': 'Altura de la Cerca',
-    'materials.addonsLabel': 'Opciones Adicionales',
-    'materials.yourSelections': 'Sus Selecciones',
-    'materials.subtotal': 'Subtotal',
-    'materials.estimateRange': 'Rango Estimado',
-    'materials.lowEstimate': 'Bajo',
-    'materials.highEstimate': 'Alto',
-    'materials.disclaimer': 'Este es un rango aproximado. El precio final requiere una inspeccion en sitio.',
-    'materials.perSqft': '/pie cuadrado',
-    'materials.perLinearFt': '/pie lineal',
-    'materials.perFixture': '/luminaria',
-    'materials.perStep': '/escalon',
-    'materials.perGate': '/puerta',
-    'materials.flat': 'tarifa fija',
-    'materials.qty': 'Cant',
-    'materials.getEstimate': 'Obtener Mi Estimacion',
-    'materials.selectOne': 'Por favor seleccione una opcion para continuar',
-
-    // ── Results ──
-    'results.title': 'Su Estimacion',
-    'results.thankYou': 'Gracias, {name}!',
-    'results.emailSent': 'Los detalles de su estimacion han sido enviados a {email}.',
-    'results.projectSummary': 'Resumen del Proyecto',
-    'results.lineItems': 'Desglose',
-    'results.estimateRange': 'Rango Estimado del Proyecto',
-    'results.to': 'a',
-    'results.ballparkOnly': '*Solo aproximado. Cotizacion final despues de visita al sitio.',
-    'results.requestQuote': 'Solicitar una Cotizacion Formal',
-    'results.quoteMessage': 'Un contratista se comunicara con usted dentro de 24 horas.',
-    'results.startOver': 'Empezar de Nuevo',
-    'results.tryAnother': 'Probar Otro Oficio',
-    'results.poweredBy': 'Desarrollado por Draw-to-Quote',
-    'results.base': 'Base ({material})',
-    'results.total': 'Total',
-
-    // ── Widget chrome ──
-    'widget.step': 'Paso {current} de {total}',
-    'widget.back': 'Atras',
-  },
 };
 
 // US States for select dropdown
@@ -316,7 +190,8 @@ export const usStates = [
 
 // Helper function
 export function t(lang: Language, key: string, replacements?: Record<string, string>): string {
-  let text = translations[lang][key] || translations['en'][key] || key;
+  void lang; // English-only build
+  let text = translations['en'][key] || key;
   if (replacements) {
     Object.entries(replacements).forEach(([k, v]) => {
       text = text.replace(new RegExp(`{${k}}`, 'g'), v);
