@@ -13,6 +13,8 @@ import Dashboard from './pages/Dashboard'
 import Pricing from './pages/Pricing'
 import AIReceptionist from './pages/AIReceptionist'
 import EmbedPage from './pages/EmbedPage'
+import LoginPage from './pages/LoginPage'
+import OnboardingPage from './pages/OnboardingPage'
 
 export default function App() {
   return (
@@ -31,6 +33,8 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/pricing" element={<Layout><Pricing /></Layout>} />
         <Route path="/embed" element={<EmbedPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/onboarding" element={<OnboardingPage />} />
       </Routes>
     </HashRouter>
   )

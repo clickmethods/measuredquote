@@ -19,8 +19,10 @@
   # Produce the static SPA into `dist/public` (same path the Perplexity
   # deploy pipeline already uses) and have Netlify pick up Lambdas from
   # `netlify/functions`.
-  command   = "npm run build"
-  publish   = "dist/public"
+  # Build the merged frontend (frontend/) as the deployed SPA. The legacy
+  # client/ build remains available via `npm run build` for local Express dev.
+  command   = "npm --prefix frontend ci && npm --prefix frontend run build"
+  publish   = "frontend/dist"
   functions = "netlify/functions"
 
 [build.environment]
@@ -127,6 +129,8 @@
   for = "/*"
   [headers.values]
     X-Content-Type-Options = "nosniff"
-    X-Frame-Options        = "SAMEORIGIN"
+    # NOTE: no X-Frame-Options here — the estimator embed (/#/embed inside
+    # /widget/v1/widget.js iframes) must be frameable by contractor websites.
+    # Tighten later with per-tenant CSP frame-ancestors if needed.
     Referrer-Policy        = "strict-origin-when-cross-origin"
     Permissions-Policy     = "geolocation=(self), microphone=(), camera=()"

@@ -24,7 +24,8 @@ import {
 } from 'lucide-react'
 import { format, parseISO, subDays, isAfter } from 'date-fns'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
-import { mockLeads, type Lead } from '../../data/mockLeads'
+import { type Lead } from '../../data/mockLeads'
+import { useLeads } from '../../hooks/useLeads'
 import { tradeNames } from '../../data/mockSettings'
 
 const statusConfig: Record<string, { bg: string; text: string; border: string; label: string }> = {
@@ -65,9 +66,10 @@ export default function LeadsTab() {
   const [page, setPage] = useState(1)
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const { leads } = useLeads()
 
   const filtered = useMemo(() => {
-    let data = [...mockLeads]
+    let data = [...leads]
 
     if (search) {
       const s = search.toLowerCase()
@@ -100,7 +102,7 @@ export default function LeadsTab() {
     })
 
     return data
-  }, [search, tradeFilter, statusFilter, dateFilter, langFilter, sortField, sortDir])
+  }, [leads, search, tradeFilter, statusFilter, dateFilter, langFilter, sortField, sortDir])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
