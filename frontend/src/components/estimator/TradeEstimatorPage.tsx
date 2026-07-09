@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import type { TradeConfig } from '@/data/tradeConfigs';
 import type { Language } from '@/data/translations';
 import EstimatorWidget from './EstimatorWidget';
-import Footer from '@/components/Footer';
 
 interface Props {
   trade: TradeConfig;
@@ -81,7 +80,6 @@ export default function TradeEstimatorPage({ trade, lang }: Props) {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 }

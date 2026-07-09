@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { allTradeConfigs } from '@/data/tradeConfigs';
-import Footer from '@/components/Footer';
 
 export default function DemoHub() {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -224,7 +223,6 @@ export default function DemoHub() {
         </div>
       </section>
 
-      <Footer />
     </div>
   );
 }
