@@ -21,7 +21,10 @@ export default function EstimatorStepMap({ trade, lang, leadData, onContinue }: 
   const ref = useRef<HTMLDivElement>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const drawingManagerRef = useRef<google.maps.drawing.DrawingManager | null>(null);
+  // Custom click-to-draw (DrawingManager was removed from Maps JS v3.65)
+  const pathRef = useRef<google.maps.LatLng[]>([]);
+  const shapeRef = useRef<google.maps.Polygon | google.maps.Polyline | null>(null);
+  const markersRef = useRef<google.maps.Marker[]>([]);
   const overlaysRef = useRef<Array<google.maps.Polygon | google.maps.Polyline>>([]);
   const isLinear = trade.measurementType === 'linear';
 
@@ -83,76 +86,108 @@ export default function EstimatorStepMap({ trade, lang, leadData, onContinue }: 
       });
       mapInstanceRef.current = map;
 
-      // ── Drawing Manager ──
-      const drawingMode = isLinear
-        ? maps.drawing.OverlayType.POLYLINE
-        : maps.drawing.OverlayType.POLYGON;
+      // ── Custom click-to-draw ──
+      // DrawingManager was removed from the Maps JS API in v3.65, so we draw
+      // manually: each map click adds a vertex; the shape and measurement
+      // update live; Undo removes the last point.
+      map.setOptions({ draggableCursor: 'crosshair' });
 
-      const drawingManager = new maps.drawing.DrawingManager({
-        drawingMode,
-        drawingControl: true,
-        drawingControlOptions: {
-          position: maps.ControlPosition.TOP_CENTER,
-          drawingModes: isLinear
-            ? [maps.drawing.OverlayType.POLYLINE]
-            : [maps.drawing.OverlayType.POLYGON],
-        },
-        polygonOptions: {
-          fillColor: '#2563EB',
-          fillOpacity: 0.25,
-          strokeColor: '#2563EB',
-          strokeWeight: 3,
-          clickable: true,
-          editable: true,
-          draggable: true,
-          zIndex: 10,
-        },
-        polylineOptions: {
-          strokeColor: '#2563EB',
-          strokeWeight: 4,
-          clickable: true,
-          editable: true,
-          draggable: true,
-          zIndex: 10,
-        },
-      });
-      drawingManager.setMap(map);
-      drawingManagerRef.current = drawingManager;
-
-      // ── Listen for completed shapes ──
-      maps.event.addListener(drawingManager, 'overlaycomplete', (event: google.maps.drawing.OverlayCompleteEvent) => {
-        // Clear previous overlays
-        overlaysRef.current.forEach((o) => o.setMap(null));
-        overlaysRef.current = [];
-
-        // Disable drawing mode after shape is drawn
-        drawingManager.setDrawingMode(null);
-
-        if (event.type === google.maps.drawing.OverlayType.POLYGON) {
-          const polygon = event.overlay as google.maps.Polygon;
-          overlaysRef.current.push(polygon);
-          const areaSqMeters = maps.geometry.spherical.computeArea(polygon.getPath());
-          const areaSqFt = Math.round(areaSqMeters * 10.7639);
-          setMeasurement(areaSqFt);
-          setManualValue(areaSqFt.toLocaleString());
-          setDrawnShape('polygon');
-
-          // Fit bounds to the polygon
-          const bounds = new maps.LatLngBounds();
-          polygon.getPath().forEach((latLng) => bounds.extend(latLng));
-          map.fitBounds(bounds, 20);
+      const recompute = () => {
+        const path = pathRef.current;
+        if (isLinear) {
+          if (path.length >= 2) {
+            const lengthMeters = maps.geometry.spherical.computeLength(path);
+            const lengthFt = Math.round(lengthMeters * 3.28084);
+            setMeasurement(lengthFt);
+            setManualValue(lengthFt.toLocaleString());
+            setDrawnShape('polyline');
+          } else {
+            setMeasurement(0);
+            setManualValue('');
+            setDrawnShape(null);
+          }
+        } else {
+          if (path.length >= 3) {
+            const areaSqMeters = maps.geometry.spherical.computeArea(path);
+            const areaSqFt = Math.round(areaSqMeters * 10.7639);
+            setMeasurement(areaSqFt);
+            setManualValue(areaSqFt.toLocaleString());
+            setDrawnShape('polygon');
+          } else {
+            setMeasurement(0);
+            setManualValue('');
+            setDrawnShape(null);
+          }
         }
+      };
 
-        if (event.type === google.maps.drawing.OverlayType.POLYLINE) {
-          const polyline = event.overlay as google.maps.Polyline;
-          overlaysRef.current.push(polyline);
-          const lengthMeters = maps.geometry.spherical.computeLength(polyline.getPath());
-          const lengthFt = Math.round(lengthMeters * 3.28084);
-          setMeasurement(lengthFt);
-          setManualValue(lengthFt.toLocaleString());
-          setDrawnShape('polyline');
+      const redraw = () => {
+        if (shapeRef.current) {
+          shapeRef.current.setMap(null);
+          shapeRef.current = null;
         }
+        const path = pathRef.current;
+        if (path.length >= 2) {
+          shapeRef.current = isLinear
+            ? new maps.Polyline({
+                map,
+                path,
+                strokeColor: '#2563EB',
+                strokeWeight: 4,
+                clickable: false,
+                zIndex: 10,
+              })
+            : new maps.Polygon({
+                map,
+                paths: path,
+                fillColor: '#2563EB',
+                fillOpacity: 0.25,
+                strokeColor: '#2563EB',
+                strokeWeight: 3,
+                clickable: false,
+                zIndex: 10,
+              });
+          overlaysRef.current = [shapeRef.current];
+        } else {
+          overlaysRef.current = [];
+        }
+        recompute();
+      };
+
+      map.addListener('click', (e: google.maps.MapMouseEvent) => {
+        if (!e.latLng) return;
+        pathRef.current = [...pathRef.current, e.latLng];
+        // Vertex dot for feedback
+        const marker = new maps.Marker({
+          map,
+          position: e.latLng,
+          clickable: false,
+          icon: {
+            path: maps.SymbolPath.CIRCLE,
+            scale: 5,
+            fillColor: '#FFFFFF',
+            fillOpacity: 1,
+            strokeColor: '#2563EB',
+            strokeWeight: 2,
+          },
+        });
+        markersRef.current.push(marker);
+        redraw();
       });
+
+      // Expose undo/clear to the buttons below via refs on the instance
+      (map as unknown as { __mqUndo?: () => void; __mqClear?: () => void }).__mqUndo = () => {
+        pathRef.current = pathRef.current.slice(0, -1);
+        const m = markersRef.current.pop();
+        if (m) m.setMap(null);
+        redraw();
+      };
+      (map as unknown as { __mqUndo?: () => void; __mqClear?: () => void }).__mqClear = () => {
+        pathRef.current = [];
+        markersRef.current.forEach((mk) => mk.setMap(null));
+        markersRef.current = [];
+        redraw();
+      };
 
       setMapStatus('ready');
       setLoadError('');
@@ -173,20 +208,13 @@ export default function EstimatorStepMap({ trade, lang, leadData, onContinue }: 
   }, [initMap]);
 
   function clearDrawing() {
-    overlaysRef.current.forEach((o) => o.setMap(null));
-    overlaysRef.current = [];
-    setMeasurement(0);
-    setManualValue('');
-    setDrawnShape(null);
-    // Re-enable drawing mode
-    if (drawingManagerRef.current) {
-      const maps = window.google.maps;
-      if (maps) {
-        drawingManagerRef.current.setDrawingMode(
-          isLinear ? maps.drawing.OverlayType.POLYLINE : maps.drawing.OverlayType.POLYGON
-        );
-      }
-    }
+    const map = mapInstanceRef.current as unknown as { __mqClear?: () => void } | null;
+    map?.__mqClear?.();
+  }
+
+  function undoPoint() {
+    const map = mapInstanceRef.current as unknown as { __mqUndo?: () => void } | null;
+    map?.__mqUndo?.();
   }
 
   function handleManualInput(value: string) {
@@ -281,6 +309,17 @@ export default function EstimatorStepMap({ trade, lang, leadData, onContinue }: 
       {/* Drawing controls */}
       {mapStatus === 'ready' && (
         <div className="flex gap-2 mb-4">
+          <button
+            type="button"
+            onClick={undoPoint}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-md border border-[#CBD5E1] bg-white text-[#475569] hover:border-[#2563EB] hover:text-[#2563EB] transition-colors"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 14L4 9l5-5" />
+              <path d="M4 9h10a6 6 0 0 1 0 12h-3" />
+            </svg>
+            Undo
+          </button>
           <button
             type="button"
             onClick={clearDrawing}

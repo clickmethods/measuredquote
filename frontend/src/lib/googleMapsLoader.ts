@@ -14,7 +14,7 @@ let scriptLoaded = false;
  * Load Google Maps JavaScript API with all required libraries.
  * This is a SINGLETON — calling it multiple times returns the same promise.
  *
- * Libraries loaded: places, drawing, geometry
+ * Libraries loaded: places, geometry (drawing lib removed in Maps v3.65)
  * All included in one load to prevent conflicts.
  */
 export function loadGoogleMaps(): Promise<typeof google.maps> {
@@ -40,7 +40,7 @@ export function loadGoogleMaps(): Promise<typeof google.maps> {
 
     const script = document.createElement('script');
     // Load: Maps JS API + Places library + Drawing library + Geometry library
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&libraries=places,drawing,geometry&callback=${callbackName}`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${MAPS_API_KEY}&libraries=places,geometry&callback=${callbackName}`;
     script.async = true;
     script.defer = true;
 
