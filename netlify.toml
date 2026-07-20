@@ -26,7 +26,7 @@
   functions = "netlify/functions"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
   # Functions use the modern esbuild-based bundler.
   NETLIFY_USE_YARN = "false"
 

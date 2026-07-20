@@ -12,6 +12,12 @@
 // them as "secret" so they aren't included in deploy logs.
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+// Node 20 lambdas lack native WebSocket; supabase-js's realtime client throws
+// at construction without it. We never use realtime in functions, but we must
+// provide a transport so the client can be created. (Fixed on Node 22+ too.)
+import ws from "ws";
+
+const REALTIME_OPTS = { transport: ws as unknown as WebSocket["constructor"] };
 
 let cached: SupabaseClient | null = null;
 
@@ -30,6 +36,7 @@ export function getServiceClient(): SupabaseClient {
 
   cached = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false },
+    realtime: REALTIME_OPTS,
     global: { headers: { "x-application": "measuredquote-functions" } },
   });
 
@@ -51,6 +58,7 @@ export function getTenantScopedClient(jwt: string): SupabaseClient {
   }
   return createClient(url, anon, {
     auth: { persistSession: false, autoRefreshToken: false },
+    realtime: REALTIME_OPTS,
     global: { headers: { Authorization: `Bearer ${jwt}` } },
   });
 }

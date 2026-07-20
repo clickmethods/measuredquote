@@ -12,7 +12,7 @@ concrete, temp fence rental, roofing.
 - App + widget host: https://measuredquote.netlify.app
 - Embed demo page:   https://measuredquote.netlify.app/widget/v1/demo.html
 - Repo:              https://github.com/clickmethods/measuredquote (branch: main)
-- Supabase project:  buirkmlyluzumjbkzczm (us-west-2)
+- Supabase project:  wahsfuvvakddiaqamsjd ("FenceFleet", us-west-2) — prior project buirkm... was deleted Jul 19
 
 ## Architecture
 - `frontend/` — deployed SPA (blue Kimi UI): marketing site, demo hub, six
@@ -43,7 +43,7 @@ removed.
 ## Demo tenant (for embed testing)
 - Tenant: Ortiz Concrete (Demo), id 11111111-1111-1111-1111-111111111111
 - Widget secret: set in DB July 6
-- Test token: 11111111-1111-1111-1111-111111111111.c9da3df14a9b2db5.630139fb7e819eb0b441696db5391f865044743f4ca6d2d48692aa28a1a0577a
+- Test token: 11111111-1111-1111-1111-111111111111.6b9c5d6bf27906ec.aeaa2b621499fa82a7258b8ae9e74e8b9e107f32b1999c7a73bd5d91b4f7ca11
 - Embed snippet: script src widget.js + data-mq-tenant + data-mq-trade
   (fencing | concrete | temp-fence | roofing) + data-mq-token + data-mq-mount
 

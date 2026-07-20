@@ -18,7 +18,7 @@ on conflict (id) do nothing;
 -- The five demo integrations that ship with Phase 3.
 insert into public.integrations (tenant_id, provider, display_name, category, enabled, endpoint, events)
 values
-  ('11111111-1111-1111-1111-111111111111','gohighlevel','GoHighLevel','crm',true,'https://services.leadconnectorhq.com/hooks/demo','["lead.created"]'),
+  ('11111111-1111-1111-1111-111111111111','webhook','Custom Webhook','automation',true,'https://example.com/webhooks/measuredquote-demo','["lead.created","lead.status_changed"]'),
   ('11111111-1111-1111-1111-111111111111','followupboss','Follow Up Boss','crm',true,'https://api.followupboss.com/v1/events','["lead.created"]'),
   ('11111111-1111-1111-1111-111111111111','hubspot','HubSpot','crm',false,'https://api.hubapi.com/contacts/v1','["lead.created"]'),
   ('11111111-1111-1111-1111-111111111111','zapier','Zapier','automation',true,'https://hooks.zapier.com/hooks/catch/demo','["lead.created","lead.status_changed"]'),
