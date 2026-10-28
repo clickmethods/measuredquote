@@ -89,7 +89,7 @@ const faqs: FaqItem[] = [
   {
     question: 'Is there a free trial?',
     answer:
-      'Yes, every plan includes a 14-day free trial. No credit card required.',
+      'Yes, every plan includes a 30-day free trial. No credit card required.',
   },
   {
     question: 'Can I switch plans later?',
@@ -616,7 +616,7 @@ export default function Pricing() {
             viewport={{ once: true, amount: 0.15 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] as [number, number, number, number], delay: 0.2 }}
           >
-            14-day free trial. No credit card required.
+            30-day free trial. No credit card required.
           </motion.p>
 
           <motion.div

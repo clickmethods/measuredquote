@@ -94,7 +94,7 @@ function HeroSection() {
             to="/dashboard"
             className="inline-flex items-center rounded-full bg-[#16A34A] px-8 py-4 text-base font-semibold text-white transition-all hover:bg-[#15803D] hover:-translate-y-0.5 hover:shadow-lg"
           >
-            Start Free 14-Day Trial
+            Start Free 30-Day Trial
           </Link>
           <Link
             to="/demo"
@@ -721,7 +721,7 @@ function PricingSection() {
           custom={0.2}
           className="mx-auto mt-4 text-center text-base text-[#475569]"
         >
-          14-day free trial on every plan. No credit card required. Cancel anytime.
+          30-day free trial on every plan. No credit card required. Cancel anytime.
         </motion.p>
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">
@@ -821,7 +821,7 @@ function FinalCTASection() {
             to="/dashboard"
             className="inline-flex items-center rounded-full bg-[#16A34A] px-8 py-4 text-base font-semibold text-white transition-all hover:bg-[#15803D] hover:-translate-y-0.5 hover:shadow-lg"
           >
-            Start Your Free 14-Day Trial
+            Start Your Free 30-Day Trial
           </Link>
           <Link
             to="#"
