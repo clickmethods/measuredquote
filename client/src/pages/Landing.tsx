@@ -68,7 +68,7 @@ export default function Landing() {
                 <Check className="h-3.5 w-3.5 text-accent" />
                 <span>No credit card</span>
                 <Check className="h-3.5 w-3.5 text-accent" />
-                <span>14-day free trial</span>
+                <span>30-day free trial</span>
                 <Check className="h-3.5 w-3.5 text-accent" />
                 <span>Embed on any site</span>
               </div>
@@ -215,7 +215,7 @@ export default function Landing() {
             <Badge variant="secondary" className="font-mono text-[10px] uppercase tracking-wider">Pricing</Badge>
             <h2 className="font-display text-3xl mt-4 text-foreground">Pays for itself with one job.</h2>
             <p className="text-muted-foreground mt-3">
-              Flat monthly fee, no per-lead surcharge. Start on the free 14-day trial, cancel anytime.
+              Flat monthly fee, no per-lead surcharge. Start on the free 30-day trial, cancel anytime.
             </p>
           </div>
           <div className="mt-12 grid md:grid-cols-3 gap-5">

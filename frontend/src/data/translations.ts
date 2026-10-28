@@ -88,7 +88,7 @@ export const translations: Record<'en', TranslationSet> = {
     'materials.areaLabel': 'Project area: {area} sq ft',
     'materials.lengthLabel': 'Fence length: {length} linear ft',
     'materials.roofFootprint': 'Roof footprint: {area} sq ft',
-    'materials.pitchNote': '*Estimates include standard pitch adjustment (1.15x)',
+    'materials.pitchNote': '*Estimates include standard pitch adjustment (1.15x) and 10% material waste',
     'materials.materialLabel': 'Material',
     'materials.projectTypeLabel': 'Project Type',
     'materials.subOptionLabel': 'Options',
