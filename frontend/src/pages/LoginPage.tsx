@@ -53,7 +53,15 @@ export default function LoginPage() {
           if (signUpErr) throw signUpErr;
           setSuccess('Account created. Check your email to confirm, then sign in.');
         } else {
-          navigate('/onboarding');
+          // Returning contractors go straight to the dashboard.
+          const { data } = await client.auth.getSession();
+          const token = data.session?.access_token;
+          let hasTenant = false;
+          if (token) {
+            const me = await fetch('/api/tenants/me', { headers: { Authorization: `Bearer ${token}` } });
+            if (me.ok) hasTenant = Boolean((await me.json())?.tenant);
+          }
+          navigate(hasTenant ? '/dashboard' : '/onboarding');
         }
       }
     } catch (err) {

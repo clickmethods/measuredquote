@@ -58,7 +58,7 @@ function HeroSection() {
           className="mb-6 inline-flex items-center gap-2 rounded-full bg-[#DCFCE7] px-4 py-1.5"
         >
           <span className="h-2 w-2 rounded-full bg-[#16A34A]" />
-          <span className="text-sm font-medium text-[#15803D]">Now Serving 6 Trades</span>
+          <span className="text-sm font-medium text-[#15803D]">Now Serving 7 Trades</span>
         </motion.div>
 
         {/* Headline */}
@@ -476,6 +476,7 @@ function TradeCoverageSection() {
     { name: 'Decks', img: '/deck-hero.jpg', desc: 'Pressure-treated, cedar, composite, and Ipe with railing options.', path: '/demo/decks', icon: '🏠' },
     { name: 'Roofing', img: '/roofing-hero.jpg', desc: 'Shingle, metal, and standing seam with tear-off and underlayment.', path: '/demo/roofing', icon: '🏡' },
     { name: 'Fencing', img: '/fencing-hero.jpg', desc: 'Wood and vinyl privacy fencing with walk and drive gates.', path: '/demo/fencing', icon: '🚧' },
+    { name: 'Temp Fence Rental', img: '/fencing-hero.jpg', desc: 'Chain link and freestanding panels for jobsites and events, with gates and windscreen.', path: '/demo/temp-fence', icon: '🏗️' },
   ]
 
   return (
@@ -488,7 +489,7 @@ function TradeCoverageSection() {
           custom={0}
           className="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-[#2563EB]"
         >
-          6 Trades, One Platform
+          7 Trades, One Platform
         </motion.p>
         <motion.h2
           variants={fadeUp}
