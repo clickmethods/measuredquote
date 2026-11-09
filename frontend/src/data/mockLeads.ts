@@ -15,6 +15,18 @@ export interface Lead {
   created_at: string
   language: 'en' | 'es'
   source_url: string
+  /** Won/Lost outcome (DB status won|lost); undefined while the lead is open */
+  outcome?: 'won' | 'lost'
+  /** Internal notes, oldest first */
+  notes?: LeadNote[]
+  /** Last contractor or lead activity; drives the follow-up queue */
+  last_activity_at?: string
+}
+
+export interface LeadNote {
+  text: string
+  at: string
+  source?: 'typed' | 'voice'
 }
 
 export const mockLeads: Lead[] = [

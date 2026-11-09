@@ -1,5 +1,7 @@
 import { Inbox, DollarSign, Settings, Code, BarChart3, LogOut, Menu, X, Zap, Bell } from 'lucide-react'
 import { useState } from 'react'
+import { useSession } from '../../lib/tenant'
+import { getSupabase, isSupabaseConfigured } from '../../lib/supabase'
 
 export type TabId = 'leads' | 'pricing' | 'settings' | 'embed' | 'analytics' | 'integrations' | 'notifications'
 
@@ -9,7 +11,7 @@ interface SidebarProps {
 }
 
 const navItems: { id: TabId; label: string; icon: React.ElementType; badge?: string }[] = [
-  { id: 'leads', label: 'Leads Inbox', icon: Inbox, badge: '3' },
+  { id: 'leads', label: 'Leads Inbox', icon: Inbox },
   { id: 'pricing', label: 'Pricing Editor', icon: DollarSign },
   { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   { id: 'settings', label: 'Tenant Settings', icon: Settings },
@@ -20,6 +22,27 @@ const navItems: { id: TabId; label: string; icon: React.ElementType; badge?: str
 
 export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const session = useSession()
+  const tenant = 'tenant' in session ? session.tenant : null
+  const tenantName = tenant?.name ?? 'Your company'
+  const tenantEmail =
+    session.mode === 'ready' ? session.userEmail : tenant?.contact_email ?? ''
+  const initials =
+    tenantName
+      .replace(/\(.*?\)/g, '')
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0]?.toUpperCase())
+      .join('') || 'MQ'
+
+  async function signOut() {
+    if (isSupabaseConfigured()) {
+      const client = await getSupabase()
+      await client?.auth.signOut()
+    }
+    window.location.hash = '#/login'
+  }
 
   const sidebarContent = (
     <>
@@ -68,13 +91,17 @@ export default function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       <div className="px-4 py-4 mt-auto flex-shrink-0 border-t border-[#142C4D]">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-[#1A3A6B] flex items-center justify-center text-white font-semibold text-sm">
-            PC
+            {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-white text-sm font-medium truncate">Premier Co.</p>
-            <p className="text-white/50 text-xs truncate">leads@premierconstruction.com</p>
+            <p className="text-white text-sm font-medium truncate">{tenantName}</p>
+            <p className="text-white/50 text-xs truncate">{tenantEmail}</p>
           </div>
-          <button className="text-white/40 hover:text-white/70 transition-colors p-1">
+          <button
+            onClick={signOut}
+            title="Sign out"
+            className="text-white/40 hover:text-white/70 transition-colors p-1"
+          >
             <LogOut size={16} />
           </button>
         </div>

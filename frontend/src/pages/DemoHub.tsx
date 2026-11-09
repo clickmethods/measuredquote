@@ -57,18 +57,18 @@ export default function DemoHub() {
           {/* Stats bar */}
           <div className="flex items-center justify-center gap-8 md:gap-12">
             <div>
-              <span className="block text-3xl md:text-4xl font-semibold text-[#2563EB] font-mono">6</span>
+              <span className="block text-3xl md:text-4xl font-semibold text-[#2563EB] font-mono">{allTradeConfigs.length}</span>
               <span className="text-xs text-[#64748B] uppercase tracking-wide">Trade Types</span>
             </div>
             <div className="w-px h-10 bg-[#CBD5E1]" />
             <div>
-              <span className="block text-3xl md:text-4xl font-semibold text-[#2563EB] font-mono">2</span>
-              <span className="text-xs text-[#64748B] uppercase tracking-wide">Languages</span>
+              <span className="block text-3xl md:text-4xl font-semibold text-[#2563EB] font-mono">0</span>
+              <span className="text-xs text-[#64748B] uppercase tracking-wide">Site Visits to Get a Price</span>
             </div>
             <div className="w-px h-10 bg-[#CBD5E1]" />
             <div>
               <span className="block text-3xl md:text-4xl font-semibold text-[#2563EB] font-mono">60s</span>
-              <span className="text-xs text-[#64748B] uppercase tracking-wide">Avg. Completion</span>
+              <span className="text-xs text-[#64748B] uppercase tracking-wide">Typical Time to a Price</span>
             </div>
           </div>
         </div>

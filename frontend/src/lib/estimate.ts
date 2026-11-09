@@ -27,8 +27,10 @@ export interface EstimateResult {
 export function computeEstimate(
   trade: TradeConfig,
   selections: MaterialSelections,
-  measurement: number,
+  rawMeasurement: number,
 ): EstimateResult {
+  // Billable quantity (e.g. roof surface from footprint incl. pitch + waste)
+  const measurement = rawMeasurement * (trade.areaMultiplier ?? 1);
   let materialName = '';
   let materialNameEs = '';
   let materialId = selections.materialId || selections.projectTypeId || '';

@@ -46,6 +46,8 @@ export interface EstimatePDFProps {
   lineItems: PDFLineItem[];
   date: string;
   lang: 'en' | 'es';
+  /** Plain-English project summary shown above the disclaimer */
+  projectSummary?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -314,6 +316,23 @@ const styles = StyleSheet.create({
     color: COLORS.green,
   },
 
+  // Project summary
+  summaryLabel: {
+    fontSize: 10,
+    fontFamily: 'Helvetica-Bold',
+    color: COLORS.gray,
+    marginTop: 12,
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  summaryText: {
+    fontSize: 9.5,
+    lineHeight: 1.5,
+    color: '#334155',
+    marginBottom: 8,
+  },
+
   // Disclaimer
   disclaimer: {
     fontSize: 8,
@@ -388,6 +407,7 @@ export default function EstimatePDF({
   lineItems,
   date,
   lang,
+  projectSummary,
 }: EstimatePDFProps) {
   const displayTradeName = lang === 'es' && tradeNameEs ? tradeNameEs : tradeName;
   const displayMaterialName = materialName;
@@ -578,6 +598,14 @@ export default function EstimatePDF({
             ${lowPrice.toLocaleString()} - ${highPrice.toLocaleString()}
           </Text>
         </View>
+
+        {/* ── PROJECT SUMMARY ── */}
+        {projectSummary ? (
+          <View wrap={false}>
+            <Text style={styles.summaryLabel}>{lang === 'es' ? 'Resumen del proyecto' : 'Project summary'}</Text>
+            <Text style={styles.summaryText}>{projectSummary}</Text>
+          </View>
+        ) : null}
 
         {/* ── DISCLAIMER ── */}
         <Text style={styles.disclaimer}>*{tx.disclaimer}</Text>

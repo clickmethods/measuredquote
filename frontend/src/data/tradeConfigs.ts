@@ -83,6 +83,9 @@ export interface TradeConfig {
   heightOptions?: { value: number; label: string; labelEs: string; multiplier: number }[];
   // How it works section
   howItWorksSteps: { title: string; titleEs: string; description: string; descriptionEs: string }[];
+  // Converts the drawn (plan-view) measurement into billable quantity,
+  // e.g. roof footprint -> roof surface incl. pitch and waste. Default 1.
+  areaMultiplier?: number;
   // Pricing unit for results
   pricingUnit: string;
   pricingUnitEs: string;
@@ -106,7 +109,7 @@ const concreteConfig: TradeConfig = {
   pricingUnit: 'sq ft',
   pricingUnitEs: 'pie cuadrado',
   stats: [
-    { value: '~$8-10/sqft', label: 'typical range' },
+    { value: '~$6-9/sqft', label: 'typical range' },
     { value: 'Polygon area', label: 'measurement' },
     { value: '3 finish types', label: 'options' },
   ],
@@ -117,8 +120,8 @@ const concreteConfig: TradeConfig = {
       nameEs: 'Acabado de Escoba',
       description: 'Classic brushed texture for slip resistance',
       descriptionEs: 'Textura clasica para resistencia al deslizamiento',
-      priceLow: 8,
-      priceHigh: 10,
+      priceLow: 6,
+      priceHigh: 9,
       unit: 'sqft',
     },
     {
@@ -230,7 +233,7 @@ const asphaltConfig: TradeConfig = {
   pricingUnit: 'sq ft',
   pricingUnitEs: 'pie cuadrado',
   stats: [
-    { value: '~$7-9/sqft', label: 'typical range' },
+    { value: '~$6-10/sqft', label: 'typical range' },
     { value: 'Polygon area', label: 'measurement' },
     { value: '2 depth options', label: 'options' },
   ],
@@ -241,8 +244,8 @@ const asphaltConfig: TradeConfig = {
       nameEs: 'Mezcla Caliente de 2"',
       description: 'Standard residential thickness, suitable for light vehicle traffic',
       descriptionEs: 'Espesor residencial estandar, adecuado para trafico ligero',
-      priceLow: 7,
-      priceHigh: 9,
+      priceLow: 6,
+      priceHigh: 10,
       unit: 'sqft',
     },
     {
@@ -251,8 +254,8 @@ const asphaltConfig: TradeConfig = {
       nameEs: 'Asfalto Reforzado de 3"',
       description: 'Heavy-duty thickness for driveways with truck/RV traffic',
       descriptionEs: 'Espesor reforzado para entradas con trafico de camiones/RV',
-      priceLow: 9,
-      priceHigh: 12,
+      priceLow: 8,
+      priceHigh: 13,
       unit: 'sqft',
     },
   ],
@@ -263,8 +266,8 @@ const asphaltConfig: TradeConfig = {
       nameEs: 'Sellado de Asfalto',
       description: 'Protects from oxidation and extends life 3-5 years',
       descriptionEs: 'Protege de la oxidacion y extiende la vida 3-5 anos',
-      priceLow: 1,
-      priceHigh: 2,
+      priceLow: 0.2,
+      priceHigh: 0.35,
       unit: 'sqft',
     },
     {
@@ -273,9 +276,9 @@ const asphaltConfig: TradeConfig = {
       nameEs: 'Sellado de Grietas',
       description: 'Prevents water damage and further deterioration',
       descriptionEs: 'Previene danos por agua y deterioro adicional',
-      priceLow: 0.75,
-      priceHigh: 0.75,
-      unit: 'sqft',
+      priceLow: 150,
+      priceHigh: 400,
+      unit: 'flat',
     },
     {
       id: 'tear-out',
@@ -283,8 +286,8 @@ const asphaltConfig: TradeConfig = {
       nameEs: 'Demolicion y Remocion',
       description: 'Remove and dispose of existing asphalt or concrete',
       descriptionEs: 'Remueve y dispone del asfalto o concreto existente',
-      priceLow: 2,
-      priceHigh: 3,
+      priceLow: 1,
+      priceHigh: 2.5,
       unit: 'sqft',
     },
     {
@@ -344,7 +347,7 @@ const landscapeConfig: TradeConfig = {
   pricingUnit: 'sq ft',
   pricingUnitEs: 'pie cuadrado',
   stats: [
-    { value: '~$2-35/sqft', label: 'typical range' },
+    { value: '~$2-28/sqft', label: 'typical range' },
     { value: 'Polygon area', label: 'measurement' },
     { value: '3 project types', label: 'options' },
   ],
@@ -401,8 +404,8 @@ const landscapeConfig: TradeConfig = {
       nameEs: 'Patio/Sendero de Adoquines',
       description: 'Hardscape surfaces with your choice of paver material',
       descriptionEs: 'Superficies de adoquines con material a su eleccion',
-      priceLow: 18,
-      priceHigh: 35,
+      priceLow: 14,
+      priceHigh: 28,
       unit: 'sqft',
       subOptionLabel: 'Paver Material',
       subOptionLabelEs: 'Material de Adoquin',
@@ -565,7 +568,7 @@ const deckConfig: TradeConfig = {
   pricingUnit: 'sq ft',
   pricingUnitEs: 'pie cuadrado',
   stats: [
-    { value: '~$28-65/sqft', label: 'typical range' },
+    { value: '~$25-90/sqft', label: 'typical range' },
     { value: 'Polygon area', label: 'measurement' },
     { value: '4 materials', label: 'options' },
   ],
@@ -576,8 +579,8 @@ const deckConfig: TradeConfig = {
       nameEs: 'Pino Tratado a Presion',
       description: 'Affordable, widely available, pressure-treated for durability',
       descriptionEs: 'Asequible, ampliamente disponible, tratado a presion para durabilidad',
-      priceLow: 28,
-      priceHigh: 35,
+      priceLow: 25,
+      priceHigh: 40,
       unit: 'sqft',
     },
     {
@@ -586,8 +589,8 @@ const deckConfig: TradeConfig = {
       nameEs: 'Cedro',
       description: 'Natural beauty, insect-resistant, weathers to silver-gray',
       descriptionEs: 'Belleza natural, resistente a insectos, envejece a gris plateado',
-      priceLow: 42,
-      priceHigh: 50,
+      priceLow: 40,
+      priceHigh: 55,
       unit: 'sqft',
     },
     {
@@ -596,8 +599,8 @@ const deckConfig: TradeConfig = {
       nameEs: 'Ipe (Madera Dura Brasilena)',
       description: 'Premium hardwood, 50+ year lifespan, rich walnut color',
       descriptionEs: 'Madera dura premium, vida util 50+ anos, color nogal rico',
-      priceLow: 60,
-      priceHigh: 75,
+      priceLow: 70,
+      priceHigh: 90,
       unit: 'sqft',
     },
     {
@@ -606,8 +609,8 @@ const deckConfig: TradeConfig = {
       nameEs: 'Compuesto (Trex/TimberTech)',
       description: 'Low maintenance, no staining, consistent color, 25-year warranty',
       descriptionEs: 'Bajo mantenimiento, sin tinte, color consistente, garantia de 25 anos',
-      priceLow: 45,
-      priceHigh: 55,
+      priceLow: 55,
+      priceHigh: 75,
       unit: 'sqft',
     },
   ],
@@ -701,6 +704,8 @@ const deckConfig: TradeConfig = {
 // ──────────────────────────────────────────────────────────────
 const roofingConfig: TradeConfig = {
   id: 'roofing',
+  // Satellite footprint is plan-view: x1.15 standard pitch (~6/12-7/12), x1.10 waste
+  areaMultiplier: 1.15 * 1.1,
   route: '/demo/roofing',
   name: 'Roof Replacement',
   nameEs: 'Reemplazo de Techo',
@@ -714,7 +719,7 @@ const roofingConfig: TradeConfig = {
   pricingUnit: 'sq ft',
   pricingUnitEs: 'pie cuadrado',
   stats: [
-    { value: '~$6-8/sqft', label: 'typical range' },
+    { value: '~$6-9.50/sqft', label: 'typical range' },
     { value: 'Polygon area', label: 'measurement' },
     { value: '3 shingle types', label: 'options' },
   ],
@@ -725,8 +730,8 @@ const roofingConfig: TradeConfig = {
       nameEs: 'Tejas Asfalticas de 3 Pestanas',
       description: 'Classic look, 20-25 year lifespan, most economical option',
       descriptionEs: 'Look clasico, vida util 20-25 anos, opcion mas economica',
-      priceLow: 5.5,
-      priceHigh: 7,
+      priceLow: 4.5,
+      priceHigh: 6.5,
       unit: 'sqft',
     },
     {
@@ -735,7 +740,7 @@ const roofingConfig: TradeConfig = {
       nameEs: 'Tejas Arquitectonicas',
       description: 'Dimensional appearance, 30-50 year lifespan, better wind resistance',
       descriptionEs: 'Apariencia dimensional, vida util 30-50 anos, mejor resistencia al viento',
-      priceLow: 7.5,
+      priceLow: 6,
       priceHigh: 9.5,
       unit: 'sqft',
     },
@@ -745,8 +750,8 @@ const roofingConfig: TradeConfig = {
       nameEs: 'Tejas de Lujo/Disenador',
       description: 'Premium slate or shake appearance, 50-year lifespan',
       descriptionEs: 'Apariencia premium de pizarra o madera, 50 anos de vida util',
-      priceLow: 11,
-      priceHigh: 14,
+      priceLow: 10,
+      priceHigh: 15,
       unit: 'sqft',
     },
     {
@@ -755,8 +760,8 @@ const roofingConfig: TradeConfig = {
       nameEs: 'Acero de Costura Vertical',
       description: 'Modern, 50+ year lifespan, energy-efficient, premium appearance',
       descriptionEs: 'Moderno, vida util 50+ anos, eficiente energeticamente',
-      priceLow: 10,
-      priceHigh: 13,
+      priceLow: 13,
+      priceHigh: 20,
       unit: 'sqft',
     },
     {
@@ -858,7 +863,7 @@ const fencingConfig: TradeConfig = {
   pricingUnit: 'linear ft',
   pricingUnitEs: 'pie lineal',
   stats: [
-    { value: '~$25-50/lf', label: 'typical range' },
+    { value: '~$25-60/lf', label: 'typical range' },
     { value: 'Polyline length', label: 'measurement' },
     { value: '3 materials', label: 'options' },
   ],
@@ -894,8 +899,8 @@ const fencingConfig: TradeConfig = {
       nameEs: 'Vinilo 6\' Privacidad',
       description: 'Zero maintenance, won\'t rot or fade, lifetime appearance',
       descriptionEs: 'Cero mantenimiento, no se pudre ni decolora',
-      priceLow: 35,
-      priceHigh: 50,
+      priceLow: 38,
+      priceHigh: 60,
       unit: 'linear',
     },
   ],

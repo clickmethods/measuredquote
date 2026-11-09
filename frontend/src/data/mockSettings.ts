@@ -77,24 +77,24 @@ export const mockPricingConfigs: Record<string, TradePricing> = {
   concrete: {
     trade: 'Concrete',
     base_rate_low: 6.0,
-    base_rate_high: 8.0,
+    base_rate_high: 9.0,
     base_unit: 'sqft',
     materials: [
       { id: 'mat_c_1', name: 'Broom Finish', description: 'Classic brushed texture', low_rate: 0, high_rate: 0, unit: 'sqft', is_default: true },
-      { id: 'mat_c_2', name: 'Stamped Concrete', description: 'Decorative stone patterns', low_rate: 4.0, high_rate: 5.0, unit: 'sqft', is_default: false },
-      { id: 'mat_c_3', name: 'Exposed Aggregate', description: 'Stone pebble finish', low_rate: 6.0, high_rate: 7.0, unit: 'sqft', is_default: false },
+      { id: 'mat_c_2', name: 'Stamped Concrete', description: 'Decorative stone patterns', low_rate: 6.0, high_rate: 8.0, unit: 'sqft', is_default: false },
+      { id: 'mat_c_3', name: 'Exposed Aggregate', description: 'Stone pebble finish', low_rate: 4.0, high_rate: 5.0, unit: 'sqft', is_default: false },
     ],
     addons: [
       { id: 'add_c_1', name: 'Wire Mesh', description: 'Prevents cracking', type: 'per-unit', low_price: 1.5, high_price: 1.5, unit: 'sqft' },
-      { id: 'add_c_2', name: 'Sealant', description: 'Protects surface', type: 'per-unit', low_price: 2.0, high_price: 2.0, unit: 'sqft' },
+      { id: 'add_c_2', name: 'Sealant', description: 'Protects surface', type: 'per-unit', low_price: 1.5, high_price: 1.5, unit: 'sqft' },
       { id: 'add_c_3', name: 'Tear-Out', description: 'Remove existing concrete', type: 'per-unit', low_price: 3.0, high_price: 3.0, unit: 'sqft' },
       { id: 'add_c_4', name: 'Expansion Joints', description: 'Control cuts every 10ft', type: 'per-unit', low_price: 1.0, high_price: 1.0, unit: 'sqft' },
     ],
   },
   asphalt: {
     trade: 'Asphalt',
-    base_rate_low: 3.5,
-    base_rate_high: 4.5,
+    base_rate_low: 6.0,
+    base_rate_high: 10.0,
     base_unit: 'sqft',
     materials: [
       { id: 'mat_a_1', name: 'Standard Asphalt', description: 'Commercial grade hot mix', low_rate: 0, high_rate: 0, unit: 'sqft', is_default: true },
@@ -102,21 +102,21 @@ export const mockPricingConfigs: Record<string, TradePricing> = {
       { id: 'mat_a_3', name: 'Recycled Asphalt', description: 'Eco-friendly RAP mix', low_rate: -0.5, high_rate: -0.5, unit: 'sqft', is_default: false },
     ],
     addons: [
-      { id: 'add_a_1', name: 'Sealcoating', description: 'Protective top coat', type: 'per-unit', low_price: 0.5, high_price: 0.5, unit: 'sqft' },
-      { id: 'add_a_2', name: 'Crack Filling', description: 'Fill existing cracks', type: 'per-unit', low_price: 0.75, high_price: 0.75, unit: 'sqft' },
+      { id: 'add_a_1', name: 'Sealcoating', description: 'Protective top coat', type: 'per-unit', low_price: 0.2, high_price: 0.35, unit: 'sqft' },
+      { id: 'add_a_2', name: 'Crack Filling', description: 'Fill existing cracks', type: 'flat', low_price: 150, high_price: 400, unit: 'project' },
       { id: 'add_a_3', name: 'Line Striping', description: 'Parking space markings', type: 'flat', low_price: 300, high_price: 300, unit: 'project' },
     ],
   },
   landscape: {
     trade: 'Landscape',
-    base_rate_low: 4.0,
-    base_rate_high: 5.5,
+    base_rate_low: 2.0,
+    base_rate_high: 3.5,
     base_unit: 'sqft',
     materials: [
       { id: 'mat_l_1', name: 'Sod Installation', description: 'Premium Kentucky bluegrass', low_rate: 0, high_rate: 0, unit: 'sqft', is_default: true },
-      { id: 'mat_l_2', name: 'Pavers Installation', description: 'Interlocking concrete pavers', low_rate: 5.0, high_rate: 6.0, unit: 'sqft', is_default: false },
+      { id: 'mat_l_2', name: 'Pavers Installation', description: 'Interlocking concrete pavers', low_rate: 12.0, high_rate: 24.5, unit: 'sqft', is_default: false },
       { id: 'mat_l_3', name: 'Artificial Turf', description: 'Synthetic grass, pet friendly', low_rate: 6.0, high_rate: 7.0, unit: 'sqft', is_default: false },
-      { id: 'mat_l_4', name: 'Mulch Beds', description: 'Premium hardwood mulch', low_rate: 2.0, high_rate: 2.0, unit: 'sqft', is_default: false },
+      { id: 'mat_l_4', name: 'Mulch Beds', description: 'Premium hardwood mulch', low_rate: 2.0, high_rate: 3.5, unit: 'sqft', is_default: false },
     ],
     addons: [
       { id: 'add_l_1', name: 'Irrigation System', description: 'Automatic sprinkler system', type: 'per-unit', low_price: 2.5, high_price: 2.5, unit: 'sqft' },
@@ -127,14 +127,14 @@ export const mockPricingConfigs: Record<string, TradePricing> = {
   },
   deck: {
     trade: 'Deck',
-    base_rate_low: 22.0,
-    base_rate_high: 28.0,
+    base_rate_low: 25.0,
+    base_rate_high: 40.0,
     base_unit: 'sqft',
     materials: [
       { id: 'mat_d_1', name: 'Pressure-Treated Pine', description: 'ACQ-treated lumber', low_rate: 0, high_rate: 0, unit: 'sqft', is_default: true },
-      { id: 'mat_d_2', name: 'Composite Trex', description: 'Low-maintenance composite', low_rate: 16.0, high_rate: 18.0, unit: 'sqft', is_default: false },
-      { id: 'mat_d_3', name: 'Redwood', description: 'Premium heartwood redwood', low_rate: 22.0, high_rate: 25.0, unit: 'sqft', is_default: false },
-      { id: 'mat_d_4', name: 'Cedar', description: 'Western red cedar', low_rate: 14.0, high_rate: 16.0, unit: 'sqft', is_default: false },
+      { id: 'mat_d_2', name: 'Composite Trex', description: 'Low-maintenance composite', low_rate: 30.0, high_rate: 35.0, unit: 'sqft', is_default: false },
+      { id: 'mat_d_3', name: 'Redwood', description: 'Premium heartwood redwood', low_rate: 25.0, high_rate: 30.0, unit: 'sqft', is_default: false },
+      { id: 'mat_d_4', name: 'Cedar', description: 'Western red cedar', low_rate: 15.0, high_rate: 15.0, unit: 'sqft', is_default: false },
     ],
     addons: [
       { id: 'add_d_1', name: 'Deck Railing', description: 'Composite rail system', type: 'per-unit', low_price: 18.0, high_price: 18.0, unit: 'lf' },
@@ -145,12 +145,12 @@ export const mockPricingConfigs: Record<string, TradePricing> = {
   },
   roof: {
     trade: 'Roofing',
-    base_rate_low: 3.5,
-    base_rate_high: 4.5,
+    base_rate_low: 6.0,
+    base_rate_high: 9.5,
     base_unit: 'sqft',
     materials: [
       { id: 'mat_r_1', name: 'Architectural Shingles', description: 'Dimensional asphalt shingles', low_rate: 0, high_rate: 0, unit: 'sqft', is_default: true },
-      { id: 'mat_r_2', name: 'Metal Roofing', description: 'Standing seam metal', low_rate: 5.0, high_rate: 6.0, unit: 'sqft', is_default: false },
+      { id: 'mat_r_2', name: 'Metal Roofing', description: 'Standing seam metal', low_rate: 7.0, high_rate: 10.5, unit: 'sqft', is_default: false },
       { id: 'mat_r_3', name: 'Slate Tiles', description: 'Natural stone slate', low_rate: 12.0, high_rate: 14.0, unit: 'sqft', is_default: false },
     ],
     addons: [
@@ -166,7 +166,7 @@ export const mockPricingConfigs: Record<string, TradePricing> = {
     base_unit: 'lf',
     materials: [
       { id: 'mat_f_1', name: 'Wood Privacy', description: 'Cedar picket fence', low_rate: 0, high_rate: 0, unit: 'lf', is_default: true },
-      { id: 'mat_f_2', name: 'Vinyl Privacy', description: 'Maintenance-free vinyl', low_rate: 8.0, high_rate: 10.0, unit: 'lf', is_default: false },
+      { id: 'mat_f_2', name: 'Vinyl Privacy', description: 'Maintenance-free vinyl', low_rate: 10.0, high_rate: 25.0, unit: 'lf', is_default: false },
       { id: 'mat_f_3', name: 'Aluminum', description: 'Ornamental aluminum', low_rate: 22.0, high_rate: 25.0, unit: 'lf', is_default: false },
       { id: 'mat_f_4', name: 'Chain Link', description: 'Galvanized chain link', low_rate: -8.0, high_rate: -8.0, unit: 'lf', is_default: false },
     ],

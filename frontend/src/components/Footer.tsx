@@ -29,8 +29,8 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center text-xl font-bold tracking-tight mb-4">
-              <span className="text-[#2563EB]">EZ</span>
-              <span className="text-white font-semibold">-Estimates</span>
+              <span className="text-white">Measured</span>
+              <span className="text-[#60A5FA] font-semibold ml-1.5">Quote</span>
             </div>
             <p className="text-[#93C5FD] text-sm leading-relaxed">
               Turn estimates into revenue.
@@ -92,7 +92,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="mt-12 pt-6 border-t border-[#142C4D] flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-[#93C5FD]/70 text-xs">
-            &copy; 2025 Measured Quote. All rights reserved.
+            &copy; {new Date().getFullYear()} Measured Quote. All rights reserved.
           </p>
           <p className="text-[#93C5FD]/50 text-xs">
             Built for contractors.

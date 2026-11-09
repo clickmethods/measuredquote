@@ -5,6 +5,8 @@ import { t } from '@/data/translations';
 import type { LeadFormData } from './EstimatorStepLeadGate';
 import type { MaterialSelections } from './EstimatorStepMaterials';
 import PDFDownloadButton from './PDFDownloadButton';
+import { computeEstimate } from '@/lib/estimate';
+import { generateProjectSummary } from '@/lib/leadAI';
 
 export interface ContactData {
   fullName: string;
@@ -89,51 +91,20 @@ export default function EstimatorStepResults({ trade, lang, leadData, measuremen
     }
   }
 
-  // Height multiplier for fencing
-  let heightMultiplier = 1;
-  if (trade.heightOptions && selections.heightValue) {
-    const ho = trade.heightOptions.find((h) => h.value === selections.heightValue);
-    if (ho) heightMultiplier = ho.multiplier;
-  }
-
-  // Calculate line items
-  const lineItems: LineItem[] = [];
-
-  // Base material
-  const baseLow = basePriceLow * heightMultiplier;
-  const baseHigh = basePriceHigh * heightMultiplier;
-  lineItems.push({
-    label: t(lang, 'results.base').replace('{material}', lang === 'es' ? selectedMaterialNameEs : selectedMaterialName),
-    amountLow: Math.round(baseLow * measurement),
-    amountHigh: Math.round(baseHigh * measurement),
-  });
-
-  // Add-ons
-  selections.addonIds.forEach((aid) => {
-    const a = trade.addons.find((x) => x.id === aid);
-    if (!a) return;
-    const qty = selections.addonQuantities[aid] ?? 1;
-    const isPerUnit = a.unit === 'sqft' || a.unit === 'linear';
-    if (isPerUnit) {
-      lineItems.push({
-        label: lang === 'es' ? a.nameEs : a.name,
-        amountLow: Math.round(a.priceLow * measurement * heightMultiplier),
-        amountHigh: Math.round(a.priceHigh * measurement * heightMultiplier),
-      });
-    } else if (a.unit === 'per-fixture' || a.unit === 'per-step' || a.unit === 'per-gate') {
-      lineItems.push({
-        label: lang === 'es' ? a.nameEs : a.name,
-        amountLow: Math.round(a.priceLow * qty),
-        amountHigh: Math.round(a.priceHigh * qty),
-      });
-    } else {
-      lineItems.push({
-        label: lang === 'es' ? a.nameEs : a.name,
-        amountLow: Math.round(a.priceLow),
-        amountHigh: Math.round(a.priceHigh),
-      });
-    }
-  });
+  // Line items come from the shared estimate engine so the price the
+  // homeowner sees always matches the price stored on the lead
+  // (includes trade multipliers such as roof pitch + waste).
+  const est = computeEstimate(trade, selections, measurement);
+  const lineItems: LineItem[] = est.lineItems.map((li, idx) => ({
+    label:
+      idx === 0
+        ? t(lang, 'results.base').replace('{material}', lang === 'es' ? li.labelEs : li.label)
+        : lang === 'es'
+          ? li.labelEs
+          : li.label,
+    amountLow: li.amountLow,
+    amountHigh: li.amountHigh,
+  }));
 
   // Totals
   const totalLow = lineItems.reduce((s, i) => s + i.amountLow, 0);
@@ -169,6 +140,20 @@ export default function EstimatorStepResults({ trade, lang, leadData, measuremen
     amountLow: item.amountLow,
     amountHigh: item.amountHigh,
   }));
+
+  const projectAddress = [leadData.streetAddress, leadData.city, [leadData.state, leadData.zipCode].filter(Boolean).join(' ')]
+    .filter(Boolean)
+    .join(', ');
+  const projectSummary = generateProjectSummary({
+    tradeName: trade.name,
+    materialName: selectedMaterialName,
+    measurement,
+    measurementUnit,
+    addons: lineItems.slice(1).map((li) => li.label),
+    lowPrice: totalLow,
+    highPrice: totalHigh,
+    address: projectAddress,
+  });
 
   const today = new Date();
   const formattedDate = lang === 'es'
@@ -257,6 +242,12 @@ export default function EstimatorStepResults({ trade, lang, leadData, measuremen
 
           {/* Line items — unlocked only */}
           {unlocked && (<>
+          {lang === 'en' && (
+            <div className="border border-[#E2E8F0] rounded-[14px] p-4 mb-5 bg-[#FAFBFC]">
+              <p className="text-xs font-semibold text-[#334155] uppercase tracking-wide mb-1.5">Your project summary</p>
+              <p className="text-[13px] leading-relaxed text-[#475569]">{projectSummary}</p>
+            </div>
+          )}
           <h5 className="text-sm font-semibold text-[#334155] mb-3 uppercase tracking-wide">
             {t(lang, 'results.lineItems')}
           </h5>
@@ -371,7 +362,7 @@ export default function EstimatorStepResults({ trade, lang, leadData, measuremen
               clientName={contact.fullName}
               clientEmail={contact.email}
               clientPhone={contact.phone}
-              projectAddress={`${leadData.streetAddress}, ${leadData.city}, ${leadData.state} ${leadData.zipCode}`}
+              projectAddress={projectAddress}
               tradeName={trade.name}
               tradeNameEs={trade.nameEs}
               measurement={measurement}
@@ -386,6 +377,7 @@ export default function EstimatorStepResults({ trade, lang, leadData, measuremen
               lineItems={pdfLineItems}
               date={formattedDate}
               lang={lang}
+              projectSummary={lang === 'en' ? projectSummary : undefined}
             />
             </>)}
 

@@ -27,9 +27,13 @@ import {
   serverError,
 } from "../lib/response";
 
+// Single founding-pilot plan ($99/mo). Legacy plan keys map to it so old
+// clients keep working.
+const PILOT_PRICE = process.env.STRIPE_PRICE_PILOT || process.env.STRIPE_PRICE_PRO;
 const PRICE_BY_PLAN: Record<string, string | undefined> = {
-  starter: process.env.STRIPE_PRICE_STARTER,
-  pro: process.env.STRIPE_PRICE_PRO,
+  pilot: PILOT_PRICE,
+  starter: PILOT_PRICE,
+  pro: PILOT_PRICE,
 };
 
 export const handler: Handler = async (event) => {
@@ -56,7 +60,7 @@ export const handler: Handler = async (event) => {
     if (membership.role !== "owner") return forbidden("only owners can manage billing");
 
     const body = event.body ? JSON.parse(event.body) : {};
-    const plan = String(body.plan || "starter").toLowerCase();
+    const plan = String(body.plan || "pilot").toLowerCase();
     const price = PRICE_BY_PLAN[plan];
     if (!price) return badRequest(`unknown plan: ${plan}`);
 
