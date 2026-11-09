@@ -1,4 +1,6 @@
 import { useState, useCallback } from 'react'
+import { useLeads } from '../../hooks/useLeads'
+import InsightsPanel from './insights/InsightsPanel'
 import {
   BarChart,
   Bar,
@@ -159,6 +161,7 @@ function ConversionCard({ label, value, color }: { label: string; value: number;
 /* ─── Main Component ─── */
 export default function AnalyticsTab() {
   const [timeRange, setTimeRange] = useState<TimeRange>('30d')
+  const { leads, now, live } = useLeads()
 
   const timeRangeData: Record<TimeRange, typeof leadsOverTime> = {
     '7d': leadsOverTime7D,
@@ -184,6 +187,16 @@ export default function AnalyticsTab() {
 
   return (
     <div className="space-y-6 animate-[fadeIn_0.3s_ease-out]">
+      <InsightsPanel leads={leads} now={now} live={live} />
+
+      <div className="flex items-start gap-2 rounded-[10px] border border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3 text-xs text-[#64748B]">
+        <span className="font-semibold text-[#475569] shrink-0">Sample data:</span>
+        <span>
+          The widget funnel and charts below show example numbers. Live funnel tracking is next on the roadmap.
+          Lead insights above are calculated from your real leads.
+        </span>
+      </div>
+
       {/* ── 1. Summary Stats Row ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <StatCard

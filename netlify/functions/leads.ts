@@ -48,6 +48,8 @@ interface LeadInput {
   source_url?: string;
 }
 
+const LEAD_STATUSES = ["new", "contacted", "scheduled", "quoted", "won", "lost"];
+
 function parseLeadIdFromPath(path: string): { id: string | null; isPdf: boolean } {
   // matches /.netlify/functions/leads/<id> and /.netlify/functions/leads/<id>/proposal.pdf
   const m = /\/leads\/([^/]+)(\/proposal\.pdf)?$/.exec(path);
@@ -55,7 +57,11 @@ function parseLeadIdFromPath(path: string): { id: string | null; isPdf: boolean 
   return { id: m[1], isPdf: Boolean(m[2]) };
 }
 
-async function authorize(event: HandlerEvent): Promise<{ tenantId: string } | { error: string }> {
+type AuthKind = "widget" | "user";
+
+async function authorize(
+  event: HandlerEvent,
+): Promise<{ tenantId: string; kind: AuthKind } | { error: string }> {
   const bearer = getBearer(event);
   const widgetToken = event.headers["x-measuredquote-widget-token"];
 
@@ -73,7 +79,7 @@ async function authorize(event: HandlerEvent): Promise<{ tenantId: string } | { 
     if (tenant.status !== "active") return { error: "tenant inactive" };
     const verified = verifyWidgetToken(widgetToken, tenant.widget_token_secret);
     if (!verified) return { error: "widget token signature mismatch" };
-    return { tenantId: tenant.id };
+    return { tenantId: tenant.id, kind: "widget" };
   }
 
   // User session path: trust Supabase JWT, look up tenant membership.
@@ -88,7 +94,7 @@ async function authorize(event: HandlerEvent): Promise<{ tenantId: string } | { 
       .limit(1)
       .single();
     if (!membership) return { error: "no tenant membership" };
-    return { tenantId: membership.tenant_id };
+    return { tenantId: membership.tenant_id, kind: "user" };
   }
 
   return { error: "missing credentials" };
@@ -100,7 +106,14 @@ export const handler: Handler = async (event) => {
   try {
     const auth = await authorize(event);
     if ("error" in auth) return forbidden(auth.error);
-    const { tenantId } = auth;
+    const { tenantId, kind } = auth;
+
+    // The widget token is public (it ships in every contractor's embed code),
+    // so it may only CREATE leads. Reading or editing leads requires a real
+    // signed-in tenant member.
+    if (kind === "widget" && event.httpMethod !== "POST") {
+      return forbidden("widget token can only create leads");
+    }
 
     const { id, isPdf } = parseLeadIdFromPath(event.path);
     const supabase = getServiceClient();
@@ -222,7 +235,61 @@ export const handler: Handler = async (event) => {
       return created(lead);
     }
 
-    return methodNotAllowed(["GET", "POST", "OPTIONS"]);
+    // --- UPDATE (status / outcome / note) -------------------------------------
+    if (id && event.httpMethod === "PATCH") {
+      if (!event.body) return badRequest("missing body");
+      let body: { status?: string; note?: string; note_source?: string };
+      try {
+        body = JSON.parse(event.body);
+      } catch {
+        return badRequest("invalid json");
+      }
+      const update: Record<string, unknown> = { last_activity_at: new Date().toISOString() };
+
+      if (body.status !== undefined) {
+        if (!LEAD_STATUSES.includes(body.status)) return badRequest("invalid status");
+        update.status = body.status;
+      }
+
+      if (body.note !== undefined) {
+        const text = String(body.note).trim();
+        if (!text) return badRequest("empty note");
+        if (text.length > 4000) return badRequest("note too long");
+        const { data: current, error: readErr } = await supabase
+          .from("leads")
+          .select("notes")
+          .eq("tenant_id", tenantId)
+          .eq("id", id)
+          .single();
+        if (readErr || !current) return notFound("lead not found");
+        const notes = Array.isArray(current.notes) ? current.notes : [];
+        notes.push({
+          text,
+          at: new Date().toISOString(),
+          source: body.note_source === "voice" ? "voice" : "typed",
+        });
+        update.notes = notes.slice(-200);
+      }
+
+      if (update.status === undefined && update.notes === undefined) {
+        return badRequest("nothing to update");
+      }
+
+      const { data: lead, error } = await supabase
+        .from("leads")
+        .update(update)
+        .eq("tenant_id", tenantId)
+        .eq("id", id)
+        .select()
+        .single();
+      if (error || !lead) return notFound("lead not found");
+      if (update.status) {
+        fanoutEvent(tenantId, "lead.updated", { lead }).catch(() => undefined);
+      }
+      return ok(lead);
+    }
+
+    return methodNotAllowed(["GET", "POST", "PATCH", "OPTIONS"]);
   } catch (err) {
     return serverError(err);
   }

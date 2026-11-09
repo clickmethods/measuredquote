@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { motion, useInView } from 'framer-motion'
 import {
   Code, Users, TrendingUp, CheckCircle, ChevronRight,
-  Star, ArrowRight
+  ArrowRight
 } from 'lucide-react'
 
 /* ─── Animation helpers ─── */
@@ -112,19 +112,8 @@ function HeroSection() {
           transition={{ duration: 0.4, delay: 1.2, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
           className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          {/* Avatar stack */}
-          <div className="flex -space-x-2">
-            {[1, 2, 3].map((i) => (
-              <img
-                key={i}
-                src={`/contractor-portrait-${i}.jpg`}
-                alt=""
-                className="h-8 w-8 rounded-full border-2 border-white/30 object-cover"
-              />
-            ))}
-          </div>
-          <span className="text-xs font-medium text-white/50 tracking-wide">
-            Trusted by 500+ contractors nationwide
+          <span className="text-xs font-medium text-white/60 tracking-wide">
+            Now enrolling founding pilot contractors · 30 days free · no credit card
           </span>
         </motion.div>
       </div>
@@ -188,7 +177,7 @@ function HowItWorksSection() {
     {
       num: '03',
       title: 'Close More Deals',
-      body: 'Review leads in your dashboard, follow up with precise estimates, and watch your conversion rate climb. Average contractors see 3x more booked jobs.',
+      body: 'Review leads in your dashboard, follow up with precise estimates, and watch your conversion rate climb.',
       icon: <TrendingUp className="h-6 w-6 text-white" />,
       bg: 'bg-[#F59E0B]',
     },
@@ -452,7 +441,7 @@ function ROICalculatorSection() {
           transition={{ duration: 0.6, delay: 0.5, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] }}
           className="mt-8 rounded-2xl bg-white/5 p-8 text-center border border-white/10"
         >
-          <p className="text-sm text-[#93C5FD]">With Measured Quote at 12% capture rate:</p>
+          <p className="text-sm text-[#93C5FD]">If Measured Quote captured 12% of visitors (illustrative assumption):</p>
           <p className="mt-3 font-mono text-3xl font-semibold text-[#4ADE80]">
             {ezLeads} leads/month
           </p>
@@ -558,94 +547,6 @@ function TradeCoverageSection() {
   )
 }
 
-/* ─── Section 7: Testimonials ─── */
-function TestimonialsSection() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-10% 0px' })
-
-  const testimonials = [
-    {
-      quote: "I was losing leads to sticker shock. Now homeowners see a range upfront and call me already knowing the ballpark. My close rate went from 15% to 35%.",
-      name: 'Mike Castellano',
-      company: 'Castellano Concrete, NJ',
-      img: '/contractor-portrait-1.jpg',
-    },
-    {
-      quote: "The Spanish language option alone brought me 8 new jobs last month. My Hispanic customers love being able to estimate in their own language.",
-      name: 'Sarah Mendez',
-      company: 'GreenScape Landscaping, TX',
-      img: '/contractor-portrait-2.jpg',
-    },
-    {
-      quote: "I embedded the widget on my WordPress site in under 5 minutes. The leads started coming in the next day. Best ROI I've ever had on any marketing tool.",
-      name: 'Jim Halverson',
-      company: 'Halverson Roofing, MN',
-      img: '/contractor-portrait-3.jpg',
-    },
-  ]
-
-  return (
-    <section ref={ref} className="bg-[#F8FAFC] py-20 border-t border-[#E2E8F0]">
-      <div className="mx-auto max-w-[1280px] px-6 lg:px-12">
-        <motion.p
-          variants={fadeUp}
-          initial="hidden"
-          animate={isInView ? 'visible' : 'hidden'}
-          custom={0}
-          className="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-[#2563EB]"
-        >
-          Contractor Stories
-        </motion.p>
-        <motion.h2
-          variants={fadeUp}
-          initial="hidden"
-          animate={isInView ? 'visible' : 'hidden'}
-          custom={0.1}
-          className="mb-14 text-center text-2xl font-bold text-[#0F172A] sm:text-3xl md:text-4xl"
-        >
-          Built by Contractors, for Contractors
-        </motion.h2>
-
-        <div className="grid gap-8 md:grid-cols-3">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={t.name}
-              variants={fadeUp}
-              initial="hidden"
-              animate={isInView ? 'visible' : 'hidden'}
-              custom={0.2 + i * 0.15}
-              className="rounded-2xl border border-[#E2E8F0] bg-white p-8 shadow-md"
-            >
-              {/* Stars */}
-              <div className="mb-4 flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, si) => (
-                  <Star key={si} className="h-4 w-4 fill-[#F59E0B] text-[#F59E0B]" />
-                ))}
-              </div>
-
-              <p className="text-base leading-relaxed text-[#334155] italic">
-                &ldquo;{t.quote}&rdquo;
-              </p>
-
-              <div className="mt-6 flex items-center gap-3">
-                <img
-                  src={t.img}
-                  alt={t.name}
-                  className="h-12 w-12 rounded-full object-cover"
-                />
-                <div>
-                  <p className="text-sm font-semibold text-[#0F172A]">{t.name}</p>
-                  <p className="text-xs text-[#64748B]">{t.company}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
 /* ─── Section 8: Pricing Preview ─── */
 function PricingSection() {
   const ref = useRef(null)
@@ -653,43 +554,18 @@ function PricingSection() {
 
   const plans = [
     {
-      name: 'Solo Pro',
-      price: '$49',
-      desc: 'Perfect for independent contractors',
-      features: [
-        '1 trade type',
-        'Up to 50 leads/month',
-        'Basic pricing editor',
-        'Email notifications',
-        'English & Spanish widget',
-      ],
-      highlighted: false,
-    },
-    {
-      name: 'Contractor Pro',
+      name: 'Founding Pilot',
       price: '$99',
-      desc: 'For growing contractors with multiple trades',
+      desc: 'Every feature, every trade. Price locked for 12 months.',
       features: [
-        '3 trade types',
-        'Unlimited leads',
-        'Advanced pricing rules',
-        'Lead export (CSV)',
-        'Priority support',
+        'Draw-to-quote widget for all 7 trades',
+        'Itemized PDF estimates with project summary',
+        'Lead inbox, notes and Won/Lost tracking',
+        'Follow-up drafts for quiet leads (English & Spanish)',
+        'Price confidence score on every lead',
+        'Voice site notes and lead insights',
       ],
       highlighted: true,
-    },
-    {
-      name: 'Ultimate Pro',
-      price: '$199',
-      desc: 'For multi-crew operations',
-      features: [
-        'All 6 trade types',
-        'Custom branding (logo, colors)',
-        'Team member access (5 seats)',
-        'API access',
-        'White-label option',
-      ],
-      highlighted: false,
     },
   ]
 
@@ -712,7 +588,7 @@ function PricingSection() {
           custom={0.1}
           className="text-center text-2xl font-bold text-[#0F172A] sm:text-3xl md:text-4xl"
         >
-          Start Free. Scale as You Grow.
+          One Plan. $99 a Month.
         </motion.h2>
         <motion.p
           variants={fadeUp}
@@ -724,7 +600,7 @@ function PricingSection() {
           30-day free trial on every plan. No credit card required. Cancel anytime.
         </motion.p>
 
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
+        <div className="mt-14 grid gap-6 max-w-[520px] mx-auto">
           {plans.map((p, i) => (
             <motion.div
               key={p.name}
@@ -737,7 +613,7 @@ function PricingSection() {
               {/* Badge */}
               {p.highlighted && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#2563EB] px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
-                  Most Popular
+                  Founding Pilot
                 </span>
               )}
 
@@ -758,7 +634,7 @@ function PricingSection() {
               </ul>
 
               <Link
-                to="/dashboard"
+                to="/login"
                 className={`mt-8 block w-full rounded-md py-3 text-center text-sm font-semibold transition-all duration-200 ${p.highlighted ? 'bg-[#2563EB] text-white hover:bg-[#1A3A6B]' : 'border-[1.5px] border-[#2563EB] text-[#2563EB] hover:bg-[#EFF6FF]'}`}
               >
                 Start Free Trial
@@ -768,9 +644,8 @@ function PricingSection() {
         </div>
 
         <p className="mt-8 text-center text-sm text-[#2563EB]">
-          Need a custom plan for your enterprise?{' '}
-          <Link to="#" className="font-medium hover:underline">
-            Contact us &rarr;
+          <Link to="/pricing" className="font-medium hover:underline">
+            See everything in the pilot &rarr;
           </Link>
         </p>
       </div>
@@ -807,7 +682,7 @@ function FinalCTASection() {
           custom={0.2}
           className="mx-auto mt-5 max-w-[560px] text-lg leading-relaxed text-white/70"
         >
-          Join 500+ contractors already using Measured Quote to capture and convert more leads.
+          Join the founding pilot: 30 days free, then $99/month, locked for a year.
         </motion.p>
 
         <motion.div
@@ -855,7 +730,6 @@ export default function Home() {
       <FeatureSection />
       <ROICalculatorSection />
       <TradeCoverageSection />
-      <TestimonialsSection />
       <PricingSection />
       <FinalCTASection />
     </div>

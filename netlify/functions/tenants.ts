@@ -96,6 +96,7 @@ export const handler: Handler = async (event) => {
         .insert({ tenant_id: tenant.id, user_id: userId, role: "owner" });
       if (memberErr) return serverError(memberErr);
 
+      if (tenant) delete (tenant as Record<string, unknown>).widget_token_secret;
       return created({ tenant });
     }
 
@@ -115,6 +116,8 @@ export const handler: Handler = async (event) => {
         .select("*")
         .eq("id", membership.tenant_id)
         .single();
+      // Never ship the widget signing secret to the browser.
+      if (tenant) delete (tenant as Record<string, unknown>).widget_token_secret;
       return ok({ tenant, role: membership.role });
     }
 
@@ -135,6 +138,7 @@ export const handler: Handler = async (event) => {
         .select()
         .single();
       if (error) return serverError(error);
+      if (tenant) delete (tenant as Record<string, unknown>).widget_token_secret;
       return ok({ tenant });
     }
 

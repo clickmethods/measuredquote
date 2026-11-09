@@ -43,6 +43,24 @@
   force  = true
 
 [[redirects]]
+  from   = "/api/tenants"
+  to    = "/.netlify/functions/tenants"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/api/tenants/*"
+  to    = "/.netlify/functions/tenants/:splat"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/api/widget/token"
+  to    = "/.netlify/functions/widget-token"
+  status = 200
+  force  = true
+
+[[redirects]]
   from   = "/api/events"
   to    = "/.netlify/functions/events"
   status = 200
@@ -133,4 +151,4 @@
     # /widget/v1/widget.js iframes) must be frameable by contractor websites.
     # Tighten later with per-tenant CSP frame-ancestors if needed.
     Referrer-Policy        = "strict-origin-when-cross-origin"
-    Permissions-Policy     = "geolocation=(self), microphone=(), camera=()"
+    Permissions-Policy     = "geolocation=(self), microphone=(self), camera=()"

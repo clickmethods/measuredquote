@@ -231,15 +231,10 @@ export default function SettingsTab() {
         <div className="bg-[#EFF6FF] rounded-[10px] p-4 border border-[#BFDBFE]">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-[#0F172A]">Current Plan</span>
-            <span className="bg-[#2563EB] text-white text-xs font-bold px-3 py-1 rounded-full">Contractor Pro</span>
+            <span className="bg-[#2563EB] text-white text-xs font-bold px-3 py-1 rounded-full">Founding Pilot · $99/mo</span>
           </div>
-          <p className="text-xs text-[#64748B] mb-3">Unlimited leads, all trades, priority support</p>
-          <div className="flex items-center gap-3">
-            <div className="flex-1 bg-white rounded-full h-2 overflow-hidden">
-              <div className="bg-[#2563EB] h-full rounded-full" style={{ width: '68%' }} />
-            </div>
-            <span className="text-xs font-medium text-[#334155]">34 of 50 leads</span>
-          </div>
+          <p className="text-xs text-[#64748B] mb-1">All trades, unlimited leads, every feature. Price locked for 12 months.</p>
+          <p className="text-xs text-[#64748B]">30-day free trial, no card. You'll be asked to subscribe when the trial ends.</p>
         </div>
       </Section>
 

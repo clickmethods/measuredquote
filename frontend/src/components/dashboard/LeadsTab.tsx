@@ -21,11 +21,20 @@ import {
   DollarSign,
   Percent,
   Package,
+  Sparkles,
+  ThumbsUp,
+  ThumbsDown,
+  StickyNote,
 } from 'lucide-react'
 import { format, parseISO, subDays, isAfter } from 'date-fns'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { type Lead } from '../../data/mockLeads'
-import { useLeads } from '../../hooks/useLeads'
+import { useLeads, type LeadPatch } from '../../hooks/useLeads'
+import { useSession } from '../../lib/tenant'
+import { needsFollowUp } from '../../lib/leadAI'
+import FollowUpCard from './leadDesk/FollowUpCard'
+import VoiceNotes from './leadDesk/VoiceNotes'
+import QuoteRiskCard from './leadDesk/QuoteRiskCard'
 import { tradeNames } from '../../data/mockSettings'
 
 const statusConfig: Record<string, { bg: string; text: string; border: string; label: string }> = {
@@ -42,8 +51,7 @@ function formatCurrency(n: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n)
 }
 
-function relativeTime(dateStr: string): string {
-  const now = new Date()
+function relativeTime(dateStr: string, now: Date = new Date()): string {
   const d = parseISO(dateStr)
   const diffMs = now.getTime() - d.getTime()
   const diffHrs = Math.floor(diffMs / (1000 * 60 * 60))
@@ -66,7 +74,10 @@ export default function LeadsTab() {
   const [page, setPage] = useState(1)
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
   const [drawerOpen, setDrawerOpen] = useState(false)
-  const { leads } = useLeads()
+  const { leads, now, live, updateLead } = useLeads()
+  const session = useSession()
+  const companyName = 'tenant' in session ? session.tenant.name : 'our team'
+  const followUpCount = useMemo(() => leads.filter((l) => needsFollowUp(l, now)).length, [leads, now])
 
   const filtered = useMemo(() => {
     let data = [...leads]
@@ -81,10 +92,11 @@ export default function LeadsTab() {
       )
     }
     if (tradeFilter !== 'all') data = data.filter((l) => l.trade_type === tradeFilter)
-    if (statusFilter !== 'all') data = data.filter((l) => l.status === statusFilter)
+    if (statusFilter === 'followup') data = data.filter((l) => needsFollowUp(l, now))
+    else if (statusFilter === 'won' || statusFilter === 'lost') data = data.filter((l) => l.outcome === statusFilter)
+    else if (statusFilter !== 'all') data = data.filter((l) => l.status === statusFilter)
     if (langFilter !== 'all') data = data.filter((l) => l.language === langFilter)
     if (dateFilter !== 'all') {
-      const now = new Date()
       const days =
         dateFilter === 'week' ? 7 : dateFilter === 'month' ? 30 : dateFilter === '90days' ? 90 : 365
       const cutoff = subDays(now, days)
@@ -102,13 +114,13 @@ export default function LeadsTab() {
     })
 
     return data
-  }, [leads, search, tradeFilter, statusFilter, dateFilter, langFilter, sortField, sortDir])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [leads, live, search, tradeFilter, statusFilter, dateFilter, langFilter, sortField, sortDir])
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
 
   // Stats
-  const now = new Date()
   const weekAgo = subDays(now, 7)
   const totalLeads = filtered.length
   const newThisWeek = filtered.filter((l) => isAfter(parseISO(l.created_at), weekAgo)).length
@@ -209,7 +221,24 @@ export default function LeadsTab() {
           <option value="quoted">Quoted</option>
           <option value="booked">Booked</option>
           <option value="closed">Closed</option>
+          <option value="won">Won</option>
+          <option value="lost">Lost</option>
+          <option value="followup">Needs follow-up</option>
         </select>
+
+        <button
+          onClick={() => { setStatusFilter(statusFilter === 'followup' ? 'all' : 'followup'); setPage(1) }}
+          className={
+            'flex items-center gap-1.5 px-3.5 py-2.5 rounded-[6px] text-sm font-medium border transition-colors ' +
+            (statusFilter === 'followup'
+              ? 'bg-[#0F172A] text-white border-[#0F172A]'
+              : 'border-[#FDE68A] bg-[#FFFBEB] text-[#B45309] hover:bg-[#FEF3C7]')
+          }
+          title="Open leads with no activity for 48+ hours"
+        >
+          <Sparkles size={14} />
+          Needs follow-up ({followUpCount})
+        </button>
 
         <select
           value={dateFilter}
@@ -313,7 +342,7 @@ export default function LeadsTab() {
                         {st.label}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-[#94A3B8] text-xs">{relativeTime(lead.created_at)}</td>
+                    <td className="py-3 px-4 text-[#94A3B8] text-xs">{relativeTime(lead.created_at, now)}</td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-1">
                         <button
@@ -384,7 +413,13 @@ export default function LeadsTab() {
 
       {/* Lead Detail Drawer */}
       {drawerOpen && selectedLead && (
-        <LeadDetailDrawer lead={selectedLead} onClose={() => setDrawerOpen(false)} />
+        <LeadDetailDrawer
+          lead={leads.find((l) => l.id === selectedLead.id) ?? selectedLead}
+          now={now}
+          companyName={companyName}
+          onUpdate={updateLead}
+          onClose={() => setDrawerOpen(false)}
+        />
       )}
     </div>
   )
@@ -427,10 +462,47 @@ function StatCard({
   )
 }
 
-function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }) {
-  const st = statusConfig[lead.status]
+function LeadDetailDrawer({
+  lead,
+  now,
+  companyName,
+  onUpdate,
+  onClose,
+}: {
+  lead: Lead
+  now: Date
+  companyName: string
+  onUpdate: (id: string, patch: LeadPatch) => Promise<{ ok: boolean; error?: string }>
+  onClose: () => void
+}) {
+  const st = lead.outcome
+    ? lead.outcome === 'won'
+      ? { bg: 'bg-[#DCFCE7]', text: 'text-[#15803D]', border: 'border-[#BBF7D0]', label: 'Won' }
+      : { bg: 'bg-[#F1F5F9]', text: 'text-[#64748B]', border: 'border-[#E2E8F0]', label: 'Lost' }
+    : statusConfig[lead.status]
   const avgPrice = (lead.low_price + lead.high_price) / 2
   const [notes, setNotes] = useState('')
+  const [noteSource, setNoteSource] = useState<'typed' | 'voice'>('typed')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [snoozed, setSnoozed] = useState(false)
+
+  async function run(patch: LeadPatch) {
+    setSaving(true)
+    setError(null)
+    const res = await onUpdate(lead.id, patch)
+    setSaving(false)
+    if (!res.ok) setError(res.error ?? 'Could not save')
+    return res.ok
+  }
+
+  async function saveNote() {
+    if (!notes.trim()) return
+    if (await run({ note: notes.trim(), noteSource })) {
+      setNotes('')
+      setNoteSource('typed')
+    }
+  }
 
   return (
     <>
@@ -460,6 +532,23 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
               {lead.language === 'en' ? 'English' : 'Spanish'}
             </span>
           </div>
+
+          {error && (
+            <p className="text-xs text-[#DC2626] bg-[#FEF2F2] border border-[#FECACA] rounded-[8px] px-3 py-2">{error}</p>
+          )}
+
+          {/* Follow-up assistant (lead quiet 48h+) */}
+          {needsFollowUp(lead, now) && !snoozed && (
+            <FollowUpCard
+              lead={lead}
+              companyName={companyName}
+              now={now}
+              onSnooze={() => setSnoozed(true)}
+              onSent={async (channel, message) => {
+                await run({ status: 'contacted', note: `Follow-up sent by ${channel === 'sms' ? 'text' : 'email'}: ${message}` })
+              }}
+            />
+          )}
 
           {/* Contact Info */}
           <Section title="Contact Info">
@@ -524,6 +613,50 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
             </div>
           </Section>
 
+          {/* Price confidence (contractor-only) */}
+          <QuoteRiskCard lead={lead} />
+
+          {/* Job outcome */}
+          {!lead.outcome ? (
+            <Section title="Job Outcome">
+              <div className="flex items-center gap-3">
+                <button
+                  disabled={saving}
+                  onClick={() => run({ outcome: 'won' })}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#16A34A] text-white text-sm font-medium rounded-[8px] hover:bg-[#15803D] transition-colors disabled:opacity-50"
+                >
+                  <ThumbsUp size={15} />
+                  Won
+                </button>
+                <button
+                  disabled={saving}
+                  onClick={() => run({ outcome: 'lost' })}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border-[1.5px] border-[#E2E8F0] text-[#475569] text-sm font-medium rounded-[8px] hover:bg-[#F8FAFC] transition-colors disabled:opacity-50"
+                >
+                  <ThumbsDown size={15} />
+                  Lost
+                </button>
+              </div>
+              <p className="text-[11px] text-[#94A3B8] mt-2">Outcomes feed your close-rate insights on the Analytics tab.</p>
+            </Section>
+          ) : (
+            <div className={'rounded-[12px] p-4 border ' + (lead.outcome === 'won' ? 'bg-[#F0FDF4] border-[#BBF7D0]' : 'bg-[#F8FAFC] border-[#E2E8F0]')}>
+              <div className="flex items-center gap-2">
+                {lead.outcome === 'won' ? <ThumbsUp size={16} className="text-[#16A34A]" /> : <ThumbsDown size={16} className="text-[#94A3B8]" />}
+                <p className={'text-sm font-semibold ' + (lead.outcome === 'won' ? 'text-[#15803D]' : 'text-[#64748B]')}>
+                  {lead.outcome === 'won' ? `Won · ~${formatCurrency(avgPrice)} job` : 'Lost'}
+                </p>
+                <button
+                  disabled={saving}
+                  onClick={() => run({ status: 'contacted' })}
+                  className="ml-auto text-xs text-[#2563EB] hover:underline disabled:opacity-50"
+                >
+                  Reopen
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Status Timeline */}
           <Section title="Status Timeline">
             <div className="flex items-center gap-0">
@@ -554,22 +687,50 @@ function LeadDetailDrawer({ lead, onClose }: { lead: Lead; onClose: () => void }
 
           {/* Notes */}
           <Section title="Internal Notes">
+            {(lead.notes ?? []).length > 0 && (
+              <div className="space-y-2 mb-3">
+                {[...(lead.notes ?? [])].reverse().map((n, i) => (
+                  <div key={i} className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-[10px] px-3 py-2.5">
+                    <p className="text-xs text-[#334155] leading-relaxed whitespace-pre-wrap">{n.text}</p>
+                    <p className="text-[10px] text-[#94A3B8] mt-1 flex items-center gap-1">
+                      <StickyNote size={10} />
+                      {n.source === 'voice' ? 'Voice note · ' : ''}
+                      {relativeTime(n.at, new Date())}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
             <textarea
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={(e) => { setNotes(e.target.value); if (!e.target.value) setNoteSource('typed') }}
               placeholder="Add notes about this lead..."
               className="w-full px-3 py-2.5 border-[1.5px] border-[#CBD5E1] rounded-[6px] text-sm focus:outline-none focus:border-[#3B82F6] focus:ring-[3px] focus:ring-[#DBEAFE] placeholder:text-[#94A3B8] resize-none h-24"
             />
-            <button className="mt-2 px-4 py-2 bg-[#2563EB] text-white text-sm font-medium rounded-[6px] hover:bg-[#1A3A6B] transition-colors">
-              Save Note
+            <button
+              onClick={saveNote}
+              disabled={saving || !notes.trim()}
+              className="mt-2 px-4 py-2 bg-[#2563EB] text-white text-sm font-medium rounded-[6px] hover:bg-[#1A3A6B] transition-colors disabled:opacity-50"
+            >
+              {saving ? 'Saving…' : 'Save Note'}
             </button>
+            <VoiceNotes
+              onNote={(text) => {
+                setNotes((prev) => (prev ? `${prev}\n${text}` : text))
+                setNoteSource('voice')
+              }}
+            />
           </Section>
 
           {/* Actions */}
           <div className="flex items-center gap-3 pt-2">
-            <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2563EB] text-white text-sm font-medium rounded-[6px] hover:bg-[#1A3A6B] transition-colors">
+            <button
+              disabled={saving || lead.status !== 'new'}
+              onClick={() => run({ status: 'contacted' })}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-[#2563EB] text-white text-sm font-medium rounded-[6px] hover:bg-[#1A3A6B] transition-colors disabled:opacity-50"
+            >
               <Phone size={15} />
-              Mark as Contacted
+              {lead.status === 'new' ? 'Mark as Contacted' : 'Contacted'}
             </button>
             <button
               onClick={() => window.open(`mailto:${lead.email}`)}

@@ -34,6 +34,7 @@ export default function PDFDownloadButton(props: Props) {
     lineItems,
     date,
     lang,
+    projectSummary,
   } = props;
 
   // Generate a safe filename if not provided
@@ -69,6 +70,7 @@ export default function PDFDownloadButton(props: Props) {
     lineItems,
     date,
     lang,
+    projectSummary,
   };
 
   return (
